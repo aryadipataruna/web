@@ -54,4 +54,19 @@ class Penitip extends Authenticatable
     {
         return $this->hasMany(Diskusi::class, 'ID_PENITIP', 'ID_PENITIP');
     }
+
+    public function rating()
+    {
+        return $this->hasMany(Rating::class, 'id_penitip', 'ID_PENITIP');
+    }
+
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating');
+    }
+
+    public function ratingsCount()
+    {
+        return $this->ratings()->count();
+    }
 }

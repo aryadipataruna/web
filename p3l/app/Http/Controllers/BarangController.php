@@ -298,4 +298,89 @@ class BarangController extends Controller
             ], 500); // Internal Server Error
         }
     }
+
+    public function showBarangRating($id)
+    {
+        // Temukan barang berdasarkan ID
+        $barang = Barang::find($id);
+
+        // Jika barang tidak ditemukan
+        if (!$barang) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak ditemukan.'
+            ], 404);
+        }
+
+        // Ambil rating dari relasi di model Barang (hasOne)
+        $ratingData = $barang->rating;
+
+        // Jika tidak ada rating yang ditemukan untuk barang ini di tabel 'ratings'
+        if (!$ratingData) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang ini belum memiliki rating.',
+                'rating'  => null // Mengembalikan null jika belum ada rating
+            ], 200);
+        }
+
+        // Jika rating ditemukan
+        return response()->json([
+            'success' => true,
+            'message' => 'Rating barang ditemukan.',
+            'rating'  => $barang->rating 
+        ]);
+    }
+
+    public function inputBarangRating(Request $request)
+    {
+        // 1. Validasi input
+        $request->validate([
+            // Pastikan id_barang adalah string karena di model Barang $keyType = 'string'
+            'id' => 'required|string|exists:barang,id_barang',
+            'rating'    => 'required|integer|min:1|max:5',
+        ]);
+
+        $idBarang = $request->id;
+        $nilaiRating = $request->rating;
+
+        // 2. Cari barang berdasarkan id_barang
+        $barang = Barang::find($id);
+
+        if (!$barang) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang tidak ditemukan.'
+            ], 404);
+        }
+
+        // 3. Ambil id_penitip dari barang yang terkait
+        // Pastikan relasi 'penitip' di model Barang sudah benar
+        $idPenitip = $barang->id_penitip;
+
+        if (!$idPenitip) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Barang ini tidak memiliki penitip yang terkait.'
+            ], 400);
+        }
+
+        // Menggunakan updateOrCreate untuk membuat atau memperbarui rating
+        $rating = Rating::updateOrCreate(
+            ['id_barang' => $idBarang], // Kriteria pencarian: cari rating berdasarkan id_barang
+            [
+                'id_penitip' => $idPenitip,
+                'rating'     => $nilaiRating,
+                'nama_barang'=> $barang->nama_barang // Mengambil nama barang dari objek barang
+            ] // Data yang akan di-update atau dibuat
+        );
+
+        $message = $rating->wasRecentlyCreated ? 'Terima kasih telah memberi rating!' : 'Rating Anda berhasil diperbarui!';
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data'    => $rating // Mengembalikan data rating yang baru disimpan/diperbarui
+        ]);
+    }
 }

@@ -34,6 +34,7 @@ class Barang extends Model
         'status',
         'gambar_barang',
         'bukti_pembayaran',
+        'rating'
     ];
 
     protected $casts = [
@@ -69,6 +70,16 @@ class Barang extends Model
     public function penitipan()
     {
         return $this->belongsTo(PenitipanBarang::class, 'no_nota_penitipan', 'no_nota');
+    }
+
+    public function rating() 
+    {
+        return $this->hasOne(Rating::class, 'id_barang', 'id_barang');
+    }
+
+    public function currentRating()
+    {
+        return $this->rating ? $this->rating->rating : null;
     }
 }
 

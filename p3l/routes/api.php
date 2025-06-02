@@ -16,6 +16,7 @@ use App\Http\Controllers\ReqDonasiController;
 use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\LoginController; 
 use App\Http\Controllers\PenitipanController;
+use App\Http\Controllers\RatingController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -48,9 +49,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // You can add other routes here that are accessible to ANY authenticated user
 });
-
-
-// Authenticated Routes Grouped by User Type (Requires a token from the specific user type)
 
 // Authenticated Routes for Pegawai
 Route::middleware('auth:sanctum')->group(function () {
@@ -159,3 +157,6 @@ Route::get('/reqDonasi/{id}', [ReqDonasiController::class, 'show'])->name('reqDo
 Route::post('/reqDonasi/create', [ReqDonasiController::class, 'store'])->name('reqDonasi.store');
 Route::put('/reqDonasi/update/{id}', [ReqDonasiController::class, 'update'])->name('reqDonasi.update');
 Route::delete('/reqDonasi/delete/{id}', [ReqDonasiController::class, 'destroy'])->name('reqDonasi.destroy');
+
+Route::get('/barang/{id}/rating', [BarangController::class, 'showBarangRating']);
+Route::post('/barang/rating', [BarangController::class, 'inputBarangRating']);

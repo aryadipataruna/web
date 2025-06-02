@@ -42,7 +42,7 @@ Route::get('/detailBarang/{id}', function ($id) {
 })->name('detailBarang');
 
 Route::get('/historyPage', function () {
-    return view('historyPage');
+    return view('history.historyPage');
 })->name('historyPage');
 
 
