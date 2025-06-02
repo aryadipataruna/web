@@ -394,7 +394,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top px-4">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
-            <i class="fa fa-recycle me-2"></i>ReUse <strong>Mart</strong>
+            <i class="fa fa-shopping-basket"></i>ReUse <strong>Mart</strong>
         </a>
         
         <div class="search-container flex-grow-1 mx-4">
@@ -414,7 +414,10 @@
             <a href="#" class="nav-link text-light me-2">
                 <i class="fa fa-shopping-cart me-1"></i>Keranjang
             </a>
-            <a href="#" class="nav-link text-light">
+            <a href="/historyPage" class="nav-link text-light me-2">
+                <i class="fa fa-clock-rotate-left me-1"></i>History
+            </a>
+            <a href="/login-regis" class="nav-link text-light">
                 <i class="fa fa-user me-1"></i>Masuk
             </a>
         </div>
@@ -530,7 +533,7 @@
         <div class="row">
             <div class="col-md-4">
                 <h5 class="mb-3">
-                    <i class="fa fa-recycle me-2"></i>ReUse Mart
+                    <i class="fa fa-shopping-basket"></i>ReUse Mart
                 </h5>
                 <p class="text-muted">Marketplace terpercaya untuk barang bekas berkualitas. Bersama kita ciptakan masa depan yang lebih berkelanjutan.</p>
                 <div class="d-flex gap-3 mt-3">
@@ -574,7 +577,7 @@
             try {
                 // Fetch data from the API route for Barang
                 // Using relative path for API endpoint
-                const response = await fetch('/api/barang', {
+                const response = await fetch('/api/barang/tersedia', {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',

@@ -41,6 +41,12 @@ Route::get('/detailBarang/{id}', function ($id) {
     return view('detailBarangPage', ['id' => $id]);
 })->name('detailBarang');
 
+Route::get('/historyPage', function () {
+    return view('historyPage');
+})->name('historyPage');
+
+
+
 
 
 // Route::get('/passwordBiasa'), fuction (){

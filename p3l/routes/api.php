@@ -106,9 +106,11 @@ Route::post('/alamat/create', [AlamatController::class, 'store'])->name('alamat.
 Route::put('/alamat/update/{id}', [AlamatController::class, 'update'])->name('alamat.update');
 Route::delete('/alamat/delete/{id}', [AlamatController::class, 'destroy'])->name('alamat.destroy');
 
+Route::get('/barang/terjual', [BarangController::class, 'produkTerjual']); 
+Route::get('/barang/tersedia', [BarangController::class, 'produkTersedia']);
+
 Route::get('/barang', [BarangController::class, 'index'])->name('barang.index');
-Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.show');
-Route::get('/barang/terjual', [BarangController::class, 'produkTerjual']);
+Route::get('/barang/{id}', [BarangController::class, 'show'])->name('barang.show'); 
 Route::post('/barang/create', [BarangController::class, 'store'])->name('barang.store');
 Route::put('/barang/update/{id}', [BarangController::class, 'update'])->name('barang.update');
 Route::delete('/barang/delete/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');

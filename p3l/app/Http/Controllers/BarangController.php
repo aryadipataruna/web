@@ -36,29 +36,54 @@ class BarangController extends Controller
         try {
             $data = Barang::where('status', 'terjual')->get();
 
-            // Check if any items with 'terjual' status were found
             if ($data->isEmpty()) {
-                 return response()->json([
-                    "status" => false,
-                    "message" => "No sold items found.",
-                    "data" => [] // Return an empty array if no sold items exist
-                ], 404); // Use 404 Not Found if no sold items are found
+                return response()->json([
+                    "status" => true, // Status true karena permintaan berhasil, hanya datanya kosong
+                    "message" => "Tidak ada barang dengan status 'terjual' ditemukan.",
+                    "data" => [] 
+                ], 200); 
             }
 
-            
             return response()->json([
                 "status" => true,
-                "message" => "Getting all Barang successful!",
+                "message" => "Berhasil mendapatkan semua barang dengan status 'terjual'.",
                 "data" => $data
             ], 200);
-            
 
         } catch (\Exception $e) {
             return response()->json([
                 "status" => false,
-                "message" => "Getting all Barang failed!!!",
-                "data" => $e->getMessage()
-            ], 400);
+                "message" => "Gagal mendapatkan barang dengan status 'terjual'. " . $e->getMessage(),
+                "data" => null // Lebih baik mengembalikan null atau pesan error yang lebih spesifik di 'data'
+            ], 500); // Gunakan 500 Internal Server Error untuk kesalahan server
+        }
+    }
+
+    public function produkTersedia()
+    {
+        try {
+            $data = Barang::where('status', "tersedia")->get();
+
+            if ($data->isEmpty()) {
+                return response()->json([
+                    "status" => true,
+                    "message" => "Tidak ada barang dengan status 'tersedia' ditemukan.",
+                    "data" => []
+                ], 200);
+            }
+
+            return response()->json([
+                "status" => true,
+                "message" => "Berhasil mendapatkan semua barang dengan status 'tersedia'.",
+                "data" => $data
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Gagal mendapatkan barang dengan status 'tersedia'. " . $e->getMessage(),
+                "data" => null
+            ], 500);
         }
     }
 

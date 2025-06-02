@@ -198,43 +198,46 @@
             font-weight: 600;
         }
 
-
-        .quantity-adjuster {
+        /* --- Custom styles for buttons --- */
+        .action-buttons {
             display: flex;
-            align-items: center;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 25px;
         }
 
-        .quantity-adjuster label {
-            margin-right: 10px;
+        .action-buttons .btn {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .quantity-adjuster button {
-            background-color: #333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+        .action-buttons .btn-buy {
+            background-color: #28a745; /* Green for Buy Now */
+            border: none;
+            color: white;
         }
 
-        .quantity-adjuster button:hover {
-            background-color: #555;
-            border-color: #777;
+        .action-buttons .btn-buy:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px);
         }
 
-        .quantity-adjuster input {
-            width: 50px;
-            text-align: center;
-            padding: 5px;
-            margin: 0 5px;
-            border: 1px solid #555;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
+        .action-buttons .btn-cart {
+            background-color: #007bff; /* Blue for Add to Cart */
+            border: none;
+            color: white;
         }
+
+        .action-buttons .btn-cart:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+            transform: translateY(-2px);
+        }
+        /* --- End Custom styles for buttons --- */
+
 
         .side-info-area {
             flex-basis: 30%; /* Take 30% width */
@@ -260,19 +263,6 @@
         .side-info-area .info-item strong {
             display: block;
             margin-bottom: 3px;
-        }
-
-        .side-info-area .subtotal {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #555;
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .side-info-area .subtotal strong {
-            float: right;
-            color: #28a745; /* Green color for subtotal */
         }
 
         /* Style for loading message */
@@ -394,6 +384,10 @@
             .page-header a {
                 font-size: 1rem;
             }
+
+            .action-buttons {
+                flex-direction: column; /* Stack buttons vertically on small screens */
+            }
         }
 
     </style>
@@ -450,24 +444,26 @@
                     <div class="capacity-options" id="capacity-options">
                         {{-- Capacity buttons will be added here --}}
                     </div>
+                    <div class="info-item mt-3">
+                        <strong>Stok Tersedia:</strong> <span id="available-stock"></span>
+                    </div>
 
-                    <div class="quantity-adjuster">
-                        <label>Atur Jumlah</label>
-                        <button id="decrease-quantity">-</button>
-                        <input type="text" id="product-quantity" value="1" readonly>
-                        <button id="increase-quantity">+</button>
-                        <span id="quantity-info" class="ms-3 text-muted"></span>
+                    <div class="action-buttons">
+                        <button class="btn btn-buy" id="buy-now-btn">
+                            <i class="fas fa-money-bill-wave me-2"></i>Beli Sekarang
+                        </button>
+                        <button class="btn btn-cart" id="add-to-cart-btn">
+                            <i class="fas fa-cart-plus me-2"></i>Masukkan Keranjang
+                        </button>
                     </div>
-                    <div class="subtotal mt-3">
-                        Subtotal <strong id="subtotal-price"></strong>
-                    </div>
+
                 </div>
 
                 <div class="description mt-4">
                     <h3>Deskripsi Produk</h3>
                     <p id="product-description"></p>
                     <div id="additional-description">
-                        {{-- Additional details loaded here --}}
+                        <div class="info-item"><strong>Garansi:</strong> <span id="product-warranty"></span></div>
                     </div>
                 </div>
             </div>
@@ -498,366 +494,361 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    let allBarangData = []; 
-    let currentSelectedBarang = null; 
+        let allBarangData = []; // Store all fetched barang data
+        let currentSelectedBarang = null; // Store the currently displayed barang item
+        let currentSelectedVariantStock = 0; // Store stock of the currently selected variant
 
-    const loadingMessage = document.getElementById('loading-message');
-    const errorMessage = document.getElementById('error-message');
-    const barangSelectionArea = document.getElementById('barang-selection-area');
-    const barangList = document.getElementById('barang-list');
-    const productDetailContent = document.getElementById('product-detail-content');
+        const loadingMessage = document.getElementById('loading-message');
+        const errorMessage = document.getElementById('error-message');
+        const barangSelectionArea = document.getElementById('barang-selection-area');
+        const barangList = document.getElementById('barang-list');
+        const productDetailContent = document.getElementById('product-detail-content');
 
-    const productImage = document.getElementById('product-image');
-    const productName = document.getElementById('product-name');
-    const productRating = document.getElementById('product-rating');
-    const productSold = document.getElementById('product-sold');
-    const productPrice = document.getElementById('product-price');
-    const selectedCapacitySpan = document.getElementById('selected-capacity');
-    const capacityOptionsDiv = document.getElementById('capacity-options');
-    const productQuantityInput = document.getElementById('product-quantity');
-    const decreaseQuantityBtn = document.getElementById('decrease-quantity');
-    const increaseQuantityBtn = document.getElementById('increase-quantity');
-    const quantityInfoSpan = document.getElementById('quantity-info');
-    const subtotalPrice = document.getElementById('subtotal-price');
-    const productDescription = document.getElementById('product-description');
-    const additionalDescriptionDiv = document.getElementById('additional-description');
-    const minOrderSpan = document.getElementById('min-order');
-    const etalaseSpan = document.getElementById('etalase');
+        const productImage = document.getElementById('product-image');
+        const productName = document.getElementById('product-name');
+        const productRating = document.getElementById('product-rating');
+        const productSold = document.getElementById('product-sold');
+        const productPrice = document.getElementById('product-price');
+        const selectedCapacitySpan = document.getElementById('selected-capacity');
+        const capacityOptionsDiv = document.getElementById('capacity-options');
+        // const productQuantityInput = document.getElementById('product-quantity'); // Removed
+        // const decreaseQuantityBtn = document.getElementById('decrease-quantity'); // Removed
+        // const increaseQuantityBtn = document.getElementById('increase-quantity'); // Removed
+        // const quantityInfoSpan = document.getElementById('quantity-info'); // Removed
+        const availableStockSpan = document.getElementById('available-stock'); // New
+        // const subtotalPrice = document.getElementById('subtotal-price'); // Removed as 'Atur Jumlah' is gone
+        const productDescription = document.getElementById('product-description');
+        const productWarrantySpan = document.getElementById('product-warranty'); // Updated
+        const minOrderSpan = document.getElementById('min-order');
+        const etalaseSpan = document.getElementById('etalase');
 
-    // Function to fetch data from the API (for all barang)
-    async function fetchAllBarang() {
-        barangList.innerHTML = '<p class="loading-message"><span class="loading-spinner"></span> Memuat daftar barang...</p>';
-        loadingMessage.style.display = 'block'; // Show general loading for the whole page
+        // New buttons
+        const buyNowBtn = document.getElementById('buy-now-btn');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
 
-        try {
-            const response = await fetch('/api/barang', { // Assuming /api/barang returns all items
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
+        // Fungsi untuk mengambil data dari API (untuk semua barang)
+        async function fetchAllBarang() {
+            barangList.innerHTML = '<p class="loading-message"><span class="loading-spinner"></span> Memuat daftar barang...</p>';
+            loadingMessage.style.display = 'block'; // Tampilkan loading umum untuk seluruh halaman
+
+            try {
+                const response = await fetch('/api/barang', { // Asumsi /api/barang mengembalikan semua item
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
                 }
-            });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
-            }
+                const responseData = await response.json();
 
-            const responseData = await response.json();
+                if (responseData.status === true && responseData.data) {
+                    allBarangData = responseData.data; // Simpan semua data secara global
+                    renderBarangSelection(allBarangData);
+                    loadingMessage.style.display = 'none'; // Sembunyikan loading umum
+                    return allBarangData;
+                } else {
+                    barangList.innerHTML = `<p class="error-message">Gagal memuat daftar barang: ${responseData.message || 'Error tidak diketahui'}</p>`;
+                    loadingMessage.style.display = 'none';
+                    errorMessage.innerText = `Gagal memuat data: ${responseData.message || 'Error tidak diketahui'}`;
+                    errorMessage.style.display = 'block';
+                    console.error('API response indicates failure for all Barang:', responseData);
+                    return [];
+                }
 
-            if (responseData.status === true && responseData.data) {
-                allBarangData = responseData.data; // Store all data globally
-                renderBarangSelection(allBarangData);
-                loadingMessage.style.display = 'none'; // Hide general loading
-                return allBarangData;
-            } else {
-                barangList.innerHTML = `<p class="error-message">Gagal memuat daftar barang: ${responseData.message || 'Error tidak diketahui'}</p>`;
+            } catch (error) {
+                barangList.innerHTML = `<p class="error-message">Error memuat daftar barang. Silakan cek konsol untuk detail.</p>`;
                 loadingMessage.style.display = 'none';
-                errorMessage.innerText = `Gagal memuat data: ${responseData.message || 'Error tidak diketahui'}`;
+                errorMessage.innerText = `Error memuat data. Silakan cek konsol untuk detail.`;
                 errorMessage.style.display = 'block';
-                console.error('API response indicates failure for all Barang:', responseData);
+                console.error("Error fetching all barang data:", error);
                 return [];
             }
-
-        } catch (error) {
-            barangList.innerHTML = `<p class="error-message">Error memuat daftar barang. Silakan cek konsol untuk detail.</p>`;
-            loadingMessage.style.display = 'none';
-            errorMessage.innerText = `Error memuat data. Silakan cek konsol untuk detail.`;
-            errorMessage.style.display = 'block';
-            console.error("Error fetching all barang data:", error);
-            return [];
         }
-    }
 
-    // Function to fetch a single barang item by ID
-    async function fetchBarangDetail(id) {
-        productDetailContent.style.display = 'none';
-        barangSelectionArea.style.display = 'none';
-        loadingMessage.style.display = 'block';
-        errorMessage.style.display = 'none';
+        // Fungsi untuk mengambil satu item barang berdasarkan ID
+        async function fetchBarangDetail(id) {
+            productDetailContent.style.display = 'none';
+            barangSelectionArea.style.display = 'none';
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
 
-        try {
-            // Adjust API endpoint if individual item endpoint is different
-            const response = await fetch(`/api/barang/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
+            try {
+                // Sesuaikan endpoint API jika endpoint item individual berbeda
+                const response = await fetch(`/api/barang/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
                 }
-            });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
-            }
+                const responseData = await response.json();
 
-            const responseData = await response.json();
+                if (responseData.status === true && responseData.data) {
+                    loadingMessage.style.display = 'none';
+                    productDetailContent.style.display = 'flex'; // Tampilkan konten detail
+                    return responseData.data; // Kembalikan data item tunggal
+                } else {
+                    loadingMessage.style.display = 'none';
+                    errorMessage.innerText = `Gagal memuat detail produk: ${responseData.message || 'Error tidak diketahui'}`;
+                    errorMessage.style.display = 'block';
+                    console.error('API response indicates failure for Barang detail:', responseData);
+                    return null;
+                }
 
-            if (responseData.status === true && responseData.data) {
+            } catch (error) {
                 loadingMessage.style.display = 'none';
-                productDetailContent.style.display = 'flex'; // Show detail content
-                return responseData.data; // Return the single item data
-            } else {
-                loadingMessage.style.display = 'none';
-                errorMessage.innerText = `Gagal memuat detail produk: ${responseData.message || 'Error tidak diketahui'}`;
+                errorMessage.innerText = `Error memuat detail produk. Silakan cek konsol untuk detail.`;
                 errorMessage.style.display = 'block';
-                console.error('API response indicates failure for Barang detail:', responseData);
+                console.error("Error fetching barang detail data:", error);
                 return null;
             }
-
-        } catch (error) {
-            loadingMessage.style.display = 'none';
-            errorMessage.innerText = `Error memuat detail produk. Silakan cek konsol untuk detail.`;
-            errorMessage.style.display = 'block';
-            console.error("Error fetching barang detail data:", error);
-            return null;
-        }
-    }
-
-    // Function to render the list of barang for selection
-    function renderBarangSelection(barangData) {
-        barangList.innerHTML = ''; // Clear existing content
-
-        if (barangData.length === 0) {
-            barangList.innerHTML = '<p class="text-center text-white">Tidak ada barang tersedia untuk dipilih.</p>';
-            return;
         }
 
-        barangData.forEach(item => {
-            const button = document.createElement('button');
-            button.classList.add('barang-item-button');
-            button.innerText = item.nama_barang;
-            button.dataset.id = item.id_barang;
-            button.addEventListener('click', async () => {
-                // Remove 'selected-item' class from previous button
-                document.querySelectorAll('.barang-item-button').forEach(btn => {
-                    btn.classList.remove('selected-item');
-                });
-                // Add 'selected-item' class to the clicked button
-                button.classList.add('selected-item');
+        // Fungsi untuk merender daftar barang untuk seleksi
+        function renderBarangSelection(barangData) {
+            barangList.innerHTML = ''; // Bersihkan konten yang ada
 
-                const detail = await fetchBarangDetail(item.id_barang);
-                if (detail) {
-                    currentSelectedBarang = detail; // Set the current selected item
-                    renderProductDetail(detail);
-                }
-            });
-            barangList.appendChild(button);
-        });
-        barangSelectionArea.style.display = 'block'; // Show the selection area
-    }
-
-
-    // Function to render product details
-    function renderProductDetail(item) {
-        productImage.src = item.gambar_barang || 'https://placehold.co/600x400/2a2a2a/f8f9fa?text=No+Image';
-        productName.innerText = item.nama_barang;
-        productRating.innerHTML = `<i class="fas fa-star"></i> ${item.rating || 'N/A'}`; // Assuming API provides rating
-        productSold.innerText = ` | Terjual ${item.terjual || 'N/A'}`; // Assuming API provides terjual count
-        productPrice.innerText = `Rp ${item.harga_barang ? parseInt(item.harga_barang).toLocaleString('id-ID') : 'N/A'}`;
-        productDescription.innerText = item.deskripsi_barang;
-
-        // Reset quantity
-        productQuantityInput.value = 1;
-        updateSubtotal();
-
-        // Handle additional description (e.g., condition, warranty)
-        additionalDescriptionDiv.innerHTML = `
-            <div class="info-item"><strong>Kondisi:</strong> ${item.kondisi || 'Tidak Diketahui'}</div>
-            <div class="info-item"><strong>Garansi:</strong> ${item.garansi || 'Tidak ada'}</div>
-        `;
-
-        // Populate side info
-        minOrderSpan.innerText = item.min_pemesanan || '1'; // Assuming a min_pemesanan field
-        etalaseSpan.innerText = item.etalase || 'Umum'; // Assuming an etalase field
-
-        // Handle capacities (if item has variations)
-        capacityOptionsDiv.innerHTML = '';
-        if (item.variasi && item.variasi.length > 0) {
-            // Assuming variations have 'kapasitas' (capacity) and 'stok'
-            item.variasi.forEach((variant, index) => {
-                const capacityButton = document.createElement('button');
-                capacityButton.innerText = variant.kapasitas;
-                capacityButton.dataset.index = index; // Store index for easy lookup
-                capacityButton.addEventListener('click', () => {
-                    document.querySelectorAll('#capacity-options button').forEach(btn => btn.classList.remove('selected'));
-                    capacityButton.classList.add('selected');
-                    selectedCapacitySpan.innerText = variant.kapasitas;
-                    updateQuantityInfo(variant.stok); // Update available stock
-                    productQuantityInput.value = 1; // Reset quantity on capacity change
-                    updateSubtotal();
-                });
-                capacityOptionsDiv.appendChild(capacityButton);
-            });
-            // Select the first capacity by default
-            capacityOptionsDiv.querySelector('button').click();
-        } else {
-            selectedCapacitySpan.innerText = 'N/A';
-            quantityInfoSpan.innerText = `Tersedia: ${item.stok_barang || 0}`; // Use base stock if no variations
-        }
-    }
-
-    // Function to update quantity info (e.g., "Tersedia: 10")
-    function updateQuantityInfo(stock) {
-        quantityInfoSpan.innerText = `Tersedia: ${stock}`;
-    }
-
-    // Function to update subtotal
-    function updateSubtotal() {
-        if (!currentSelectedBarang) return;
-
-        const quantity = parseInt(productQuantityInput.value);
-        const price = parseFloat(currentSelectedBarang.harga_barang);
-
-        if (isNaN(price) || isNaN(quantity)) {
-            subtotalPrice.innerText = 'N/A';
-            return;
-        }
-
-        const subtotal = price * quantity;
-        subtotalPrice.innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
-    }
-
-    // Event listeners for quantity adjustment
-    decreaseQuantityBtn.addEventListener('click', () => {
-        let currentQuantity = parseInt(productQuantityInput.value);
-        if (currentQuantity > 1) {
-            productQuantityInput.value = currentQuantity - 1;
-            updateSubtotal();
-        }
-    });
-
-    increaseQuantityBtn.addEventListener('click', () => {
-        let currentQuantity = parseInt(productQuantityInput.value);
-        let maxStock = currentSelectedBarang.stok_barang; // Default to base stock
-
-        // If variations exist, get stock from the selected variation
-        if (currentSelectedBarang.variasi && currentSelectedBarang.variasi.length > 0) {
-            const selectedCapacityButton = capacityOptionsDiv.querySelector('.selected');
-            if (selectedCapacityButton) {
-                const selectedIndex = parseInt(selectedCapacityButton.dataset.index);
-                maxStock = currentSelectedBarang.variasi[selectedIndex].stok;
+            if (barangData.length === 0) {
+                barangList.innerHTML = '<p class="text-center text-white">Tidak ada barang tersedia untuk dipilih.</p>';
+                return;
             }
-        }
 
-        if (currentQuantity < maxStock) {
-            productQuantityInput.value = currentQuantity + 1;
-            updateSubtotal();
-        } else {
-            alert(`Stok maksimal untuk kapasitas ini adalah ${maxStock}.`);
-        }
-    });
+            barangData.forEach(item => {
+                const button = document.createElement('button');
+                button.classList.add('barang-item-button');
+                button.innerText = item.nama_barang;
+                button.dataset.id = item.id_barang;
+                button.addEventListener('click', async () => {
+                    // Hapus kelas 'selected-item' dari tombol sebelumnya
+                    document.querySelectorAll('.barang-item-button').forEach(btn => {
+                        btn.classList.remove('selected-item');
+                    });
+                    // Tambahkan kelas 'selected-item' ke tombol yang diklik
+                    button.classList.add('selected-item');
 
-    // Handle navigation links to show/hide sections
-    const detailProdukLink = document.getElementById('detailProdukLink');
-    const diskusiLink = document.getElementById('diskusiLink');
-    const ratingLink = document.getElementById('ratingLink');
-    const diskusiSection = document.getElementById('diskusi-section');
-    const ratingSection = document.getElementById('rating-section');
-
-    function showSection(sectionToShow) {
-        // Hide all sections
-        productDetailContent.style.display = 'none';
-        barangSelectionArea.style.display = 'none'; // Keep selection area hidden when other sections are active
-        diskusiSection.style.display = 'none';
-        ratingSection.style.display = 'none';
-
-        // Remove active class from all links
-        detailProdukLink.classList.remove('active');
-        diskusiLink.classList.remove('active');
-        ratingLink.classList.remove('active');
-
-        // Show the selected section and add active class to its link
-        if (sectionToShow === 'detail') {
-            productDetailContent.style.display = 'flex';
-            barangSelectionArea.style.display = 'block'; // Show selection area when detail is active
-            detailProdukLink.classList.add('active');
-        } else if (sectionToShow === 'diskusi') {
-            diskusiSection.style.display = 'block';
-            diskusiLink.classList.add('active');
-        } else if (sectionToShow === 'rating') {
-            ratingSection.style.display = 'block';
-            ratingLink.classList.add('active');
-        }
-    }
-
-    detailProdukLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSection('detail');
-    });
-    diskusiLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSection('diskusi');
-    });
-    ratingLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSection('rating');
-    });
-
-    // Initial load: Fetch all barang and show the selection list
-    document.addEventListener('DOMContentLoaded', async () => {
-        await fetchAllBarang();
-        // If there's an ID in the URL, automatically fetch and display that item
-        const pathSegments = window.location.pathname.split('/');
-        const itemIdFromUrl = pathSegments[pathSegments.length - 1]; // Gets the last segment
-
-        // Check if it's a valid ID (e.g., numeric, or matching a pattern for your IDs)
-        // For simplicity, we'll assume it's an ID if it's not "detailBarang"
-        if (itemIdFromUrl && itemIdFromUrl !== 'detailBarang' && allBarangData.length > 0) {
-             const foundItem = allBarangData.find(item => item.id_barang == itemIdFromUrl); // Use == for loose comparison if IDs can be string/number
-             if (foundItem) {
-                const detail = await fetchBarangDetail(foundItem.id_barang);
-                if (detail) {
-                    currentSelectedBarang = detail;
-                    renderProductDetail(detail);
-                    // Mark the button as selected if it exists
-                    const selectedButton = document.querySelector(`.barang-item-button[data-id="${foundItem.id_barang}"]`);
-                    if (selectedButton) {
-                        selectedButton.classList.add('selected-item');
+                    const detail = await fetchBarangDetail(item.id_barang);
+                    if (detail) {
+                        currentSelectedBarang = detail; // Atur item yang saat ini dipilih
+                        renderProductDetail(detail);
                     }
-                }
-             } else {
-                console.warn('Item ID from URL not found in fetched data:', itemIdFromUrl);
-                // Fallback to showing the selection list if URL ID is invalid
-                showSection('detail'); // Show the default 'detail' view with selection list
-             }
-        } else {
-            // Default: show the selection list if no valid ID in URL
-            showSection('detail');
+                });
+                barangList.appendChild(button);
+            });
+            barangSelectionArea.style.display = 'block'; // Tampilkan area seleksi
         }
-    });
 
+        // Fungsi untuk merender detail produk
+        function renderProductDetail(item) {
+            productImage.src = item.gambar_barang || 'https://placehold.co/600x400/2a2a2a/f8f9fa?text=No+Image';
+            productName.innerText = item.nama_barang;
+            productRating.innerHTML = `<i class="fas fa-star"></i> ${item.rating || 'N/A'}`; // Asumsi API menyediakan rating
+            productSold.innerText = ` | Terjual ${item.terjual || 'N/A'}`; // Asumsi API menyediakan jumlah terjual
+            productPrice.innerText = `Rp ${item.harga_barang ? parseInt(item.harga_barang).toLocaleString('id-ID') : 'N/A'}`;
+            productDescription.innerText = item.deskripsi_barang;
 
-    // Basic search functionality for the selection list
-    document.getElementById('searchInput').addEventListener('input', (event) => {
-        const searchTerm = event.target.value.toLowerCase();
-        const buttons = document.querySelectorAll('#barang-list .barang-item-button');
-        let found = false;
-
-        buttons.forEach(button => {
-            const itemName = button.innerText.toLowerCase();
-            if (itemName.includes(searchTerm)) {
-                button.style.display = 'inline-block'; // Show button
-                found = true;
+            // Atur garansi
+            if (item.garansi === true) {
+                productWarrantySpan.innerText = 'Bergaransi';
             } else {
-                button.style.display = 'none'; // Hide button
+                productWarrantySpan.innerText = 'Tidak ada';
+            }
+
+            // Isi info samping
+            minOrderSpan.innerText = item.min_pemesanan || '1'; // Asumsi bidang min_pemesanan
+            etalaseSpan.innerText = item.etalase || 'Umum'; // Asumsi bidang etalase
+
+            // Tangani kapasitas (jika item memiliki variasi)
+            capacityOptionsDiv.innerHTML = '';
+            if (item.variasi && item.variasi.length > 0) {
+                item.variasi.forEach((variant, index) => {
+                    const capacityButton = document.createElement('button');
+                    capacityButton.innerText = variant.kapasitas;
+                    capacityButton.dataset.index = index; // Simpan indeks untuk pencarian mudah
+                    capacityButton.addEventListener('click', () => {
+                        document.querySelectorAll('#capacity-options button').forEach(btn => btn.classList.remove('selected'));
+                        capacityButton.classList.add('selected');
+                        selectedCapacitySpan.innerText = variant.kapasitas;
+                        currentSelectedVariantStock = variant.stok; // Update stock for selected variant
+                        availableStockSpan.innerText = variant.stok; // Update displayed stock
+                    });
+                    capacityOptionsDiv.appendChild(capacityButton);
+                });
+                // Pilih kapasitas pertama secara default
+                capacityOptionsDiv.querySelector('button').click();
+            } else {
+                selectedCapacitySpan.innerText = 'N/A';
+                currentSelectedVariantStock = item.stok_barang || 0; // Use base stock if no variations
+                availableStockSpan.innerText = item.stok_barang || 0;
+            }
+
+            // Pastikan tombol beli dan keranjang aktif jika stok > 0
+            if (currentSelectedVariantStock > 0) {
+                buyNowBtn.disabled = false;
+                addToCartBtn.disabled = false;
+                buyNowBtn.style.opacity = '1';
+                addToCartBtn.style.opacity = '1';
+            } else {
+                buyNowBtn.disabled = true;
+                addToCartBtn.disabled = true;
+                buyNowBtn.style.opacity = '0.5'; // Visual cue for disabled
+                addToCartBtn.style.opacity = '0.5';
+            }
+        }
+
+        // Event listener untuk tombol "Beli Sekarang"
+        buyNowBtn.addEventListener('click', () => {
+            if (!currentSelectedBarang) {
+                alert('Silakan pilih barang terlebih dahulu.');
+                return;
+            }
+            if (currentSelectedVariantStock <= 0) {
+                alert('Maaf, stok untuk item ini habis.');
+                return;
+            }
+            // Logika untuk "Beli Sekarang"
+            alert(`Membeli sekarang: ${currentSelectedBarang.nama_barang} (Kapasitas: ${selectedCapacitySpan.innerText}).`);
+            // Anda bisa mengarahkan ke halaman checkout atau memproses pembelian langsung
+            // window.location.href = `/checkout?itemId=${currentSelectedBarang.id_barang}&capacity=${selectedCapacitySpan.innerText}`;
+        });
+
+        // Event listener untuk tombol "Masukkan ke Keranjang"
+        addToCartBtn.addEventListener('click', () => {
+            if (!currentSelectedBarang) {
+                alert('Silakan pilih barang terlebih dahulu.');
+                return;
+            }
+            if (currentSelectedVariantStock <= 0) {
+                alert('Maaf, stok untuk item ini habis.');
+                return;
+            }
+            // Logika untuk "Masukkan ke Keranjang"
+            alert(`Menambahkan ${currentSelectedBarang.nama_barang} (Kapasitas: ${selectedCapacitySpan.innerText}) ke keranjang.`);
+            // Anda bisa mengirim data ke API keranjang
+            // Contoh: fetch('/api/cart', { method: 'POST', body: JSON.stringify({ itemId: currentSelectedBarang.id_barang, capacity: selectedCapacitySpan.innerText, quantity: 1 }) });
+        });
+
+
+        // Tangani tautan navigasi untuk menampilkan/menyembunyikan bagian
+        const detailProdukLink = document.getElementById('detailProdukLink');
+        const diskusiLink = document.getElementById('diskusiLink');
+        const ratingLink = document.getElementById('ratingLink');
+        const diskusiSection = document.getElementById('diskusi-section');
+        const ratingSection = document.getElementById('rating-section');
+
+        function showSection(sectionToShow) {
+            // Sembunyikan semua bagian
+            productDetailContent.style.display = 'none';
+            barangSelectionArea.style.display = 'none'; // Jaga area seleksi tetap tersembunyi saat bagian lain aktif
+            diskusiSection.style.display = 'none';
+            ratingSection.style.display = 'none';
+
+            // Hapus kelas aktif dari semua tautan
+            detailProdukLink.classList.remove('active');
+            diskusiLink.classList.remove('active');
+            ratingLink.classList.remove('active');
+
+            // Tampilkan bagian yang dipilih dan tambahkan kelas aktif ke tautannya
+            if (sectionToShow === 'detail') {
+                productDetailContent.style.display = 'flex';
+                barangSelectionArea.style.display = 'block'; // Tampilkan area seleksi saat detail aktif
+                detailProdukLink.classList.add('active');
+            } else if (sectionToShow === 'diskusi') {
+                diskusiSection.style.display = 'block';
+                diskusiLink.classList.add('active');
+            } else if (sectionToShow === 'rating') {
+                ratingSection.style.display = 'block';
+                ratingLink.classList.add('active');
+            }
+        }
+
+        detailProdukLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('detail');
+        });
+        diskusiLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('diskusi');
+        });
+        ratingLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('rating');
+        });
+
+        // Pemuatan awal: Ambil semua barang dan tampilkan daftar seleksi
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchAllBarang();
+            // Jika ada ID di URL, secara otomatis ambil dan tampilkan item tersebut
+            const pathSegments = window.location.pathname.split('/');
+            const itemIdFromUrl = pathSegments[pathSegments.length - 1]; // Mengambil segmen terakhir
+
+            // Periksa apakah itu ID yang valid (misalnya, numerik, atau cocok dengan pola untuk ID Anda)
+            // Untuk kesederhanaan, kita akan mengasumsikan itu adalah ID jika bukan "detailBarang"
+            if (itemIdFromUrl && itemIdFromUrl !== 'detailBarang' && allBarangData.length > 0) {
+                const foundItem = allBarangData.find(item => item.id_barang == itemIdFromUrl); // Gunakan == untuk perbandingan longgar jika ID bisa string/angka
+                if (foundItem) {
+                    const detail = await fetchBarangDetail(foundItem.id_barang);
+                    if (detail) {
+                        currentSelectedBarang = detail;
+                        renderProductDetail(detail);
+                        // Tandai tombol sebagai terpilih jika ada
+                        const selectedButton = document.querySelector(`.barang-item-button[data-id="${foundItem.id_barang}"]`);
+                        if (selectedButton) {
+                            selectedButton.classList.add('selected-item');
+                        }
+                    }
+                } else {
+                    console.warn('ID Item dari URL tidak ditemukan dalam data yang diambil:', itemIdFromUrl);
+                    // Fallback untuk menampilkan daftar seleksi jika ID URL tidak valid
+                    showSection('detail'); // Tampilkan tampilan 'detail' default dengan daftar seleksi
+                }
+            } else {
+                // Default: tampilkan daftar seleksi jika tidak ada ID valid di URL
+                showSection('detail');
             }
         });
 
-        const noResultsMessage = barangList.querySelector('.no-results-message');
-        if (!found && searchTerm.length > 0) {
-            if (!noResultsMessage) {
-                const p = document.createElement('p');
-                p.classList.add('text-center', 'text-white', 'no-results-message');
-                p.innerText = 'Tidak ada barang yang cocok dengan pencarian Anda.';
-                barangList.appendChild(p);
-            }
-        } else {
-            if (noResultsMessage) {
-                noResultsMessage.remove();
-            }
-        }
-    });
 
-</script>
+        // Fungsionalitas pencarian dasar untuk daftar seleksi
+        document.getElementById('searchInput').addEventListener('input', (event) => {
+            const searchTerm = event.target.value.toLowerCase();
+            const buttons = document.querySelectorAll('#barang-list .barang-item-button');
+            let found = false;
 
+            buttons.forEach(button => {
+                const itemName = button.innerText.toLowerCase();
+                if (itemName.includes(searchTerm)) {
+                    button.style.display = 'inline-block'; // Tampilkan tombol
+                    found = true;
+                } else {
+                    button.style.display = 'none'; // Sembunyikan tombol
+                }
+            });
+
+            const noResultsMessage = barangList.querySelector('.no-results-message');
+            if (!found && searchTerm.length > 0) {
+                if (!noResultsMessage) {
+                    const p = document.createElement('p');
+                    p.classList.add('text-center', 'text-white', 'no-results-message');
+                    p.innerText = 'Tidak ada barang yang cocok dengan pencarian Anda.';
+                    barangList.appendChild(p);
+                }
+            } else {
+                if (noResultsMessage) {
+                    noResultsMessage.remove();
+                }
+            }
+        });
+
+    </script>
 </body>
 </html>
