@@ -1,23 +1,22 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Penjualan extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-    protected $table = 'penjualan';
+    public $timestamps    = false;
+    protected $table      = 'penjualan';
     protected $primaryKey = 'id_penjualan';
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing  = false;
+    protected $keyType    = 'string';
 
     protected $fillable = [
+        'nomor_nota',
         'id_pembeli',
         'id_barang',
         'id_komisi',
@@ -35,14 +34,14 @@ class Penjualan extends Model
     ];
 
     protected $casts = [
-        'tgl_pesan' => 'date',
-        'tgl_kirim' => 'date',
-        'tgl_ambil' => 'date',
-        'tgl_pembayaran' => 'date',
-        'total_ongkir' => 'double',
+        'tgl_pesan'            => 'date',
+        'tgl_kirim'            => 'date',
+        'tgl_ambil'            => 'date',
+        'tgl_pembayaran'       => 'date',
+        'total_ongkir'         => 'double',
         'harga_setelah_ongkir' => 'double',
-        'potongan_harga' => 'double',
-        'total_harga' => 'double',
+        'potongan_harga'       => 'double',
+        'total_harga'          => 'double',
     ];
 
     public function pembeli(): BelongsTo

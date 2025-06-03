@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegistrationHandlerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,9 +44,9 @@ Route::get('/historyPage', function () {
     return view('history.historyPage');
 })->name('historyPage');
 
-
-
-
+Route::get('/cart', function () {
+    return view('cart.cartPage');
+})->name('cartPage');
 
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
