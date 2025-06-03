@@ -40,6 +40,10 @@ Route::get('/detailBarang/{id}', function ($id) {
     return view('detailBarangPage', ['id' => $id]);
 })->name('detailBarang');
 
+Route::match(['GET', 'POST', 'PUT'], '/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
+
 Route::get('/historyPage', function () {
     return view('history.historyPage');
 })->name('historyPage');

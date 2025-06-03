@@ -403,7 +403,7 @@
         </div>
         <div class="nav-icons">
             <a href="#"><i class="fa fa-search"></i></a>
-            <a href="#"><i class="fa fa-shopping-cart"></i></a>
+            <a href="/cartPembeli"><i class="fa fa-shopping-cart"></i></a>
             <a href="#">Daftar</a>
             <a href="#">Log In</a>
         </div>
@@ -434,8 +434,8 @@
             <div class="product-info-area">
                 <h2 id="product-name"></h2>
                 <div class="rating-sold">
-                    <span id="product-rating"><i class="fas fa-star"></i> N/A</span>
-                    <span id="product-sold"> | Terjual N/A</span>
+                    <span id="product-rating"><i class="fas fa-star"></i> 4</span>
+                    <span id="product-sold"> | Terjual 14</span>
                 </div>
                 <div class="price" id="product-price"></div>
 
@@ -686,9 +686,9 @@
                 // Pilih kapasitas pertama secara default
                 capacityOptionsDiv.querySelector('button').click();
             } else {
-                selectedCapacitySpan.innerText = 'N/A';
-                currentSelectedVariantStock = item.stok_barang || 0; // Use base stock if no variations
-                availableStockSpan.innerText = item.stok_barang || 0;
+                selectedCapacitySpan.innerText = '1';
+                currentSelectedVariantStock = item.stok_barang || 1; // Use base stock if no variations
+                availableStockSpan.innerText = item.stok_barang || 1;
             }
 
             // Pastikan tombol beli dan keranjang aktif jika stok > 0
@@ -722,6 +722,7 @@
         });
 
         // Event listener untuk tombol "Masukkan ke Keranjang"
+        // Event listener untuk tombol "Masukkan ke Keranjang"
         addToCartBtn.addEventListener('click', () => {
             if (!currentSelectedBarang) {
                 alert('Silakan pilih barang terlebih dahulu.');
@@ -731,13 +732,49 @@
                 alert('Maaf, stok untuk item ini habis.');
                 return;
             }
-            // Logika untuk "Masukkan ke Keranjang"
-            alert(`Menambahkan ${currentSelectedBarang.nama_barang} (Kapasitas: ${selectedCapacitySpan.innerText}) ke keranjang.`);
-            // Anda bisa mengirim data ke API keranjang
-            // Contoh: fetch('/api/cart', { method: 'POST', body: JSON.stringify({ itemId: currentSelectedBarang.id_barang, capacity: selectedCapacitySpan.innerText, quantity: 1 }) });
+
+            // Ambil data keranjang yang sudah ada dari localStorage, atau buat array kosong jika belum ada
+            let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+
+            // Siapkan data item yang akan ditambahkan
+            const itemId = currentSelectedBarang.id_barang;
+            const itemName = currentSelectedBarang.nama_barang;
+            // Pastikan harga_barang adalah angka (string angka seperti "1500000")
+            const itemPrice = parseFloat(currentSelectedBarang.harga_barang);
+            const selectedCapacity = selectedCapacitySpan.innerText || 'N/A'; // Jika tidak ada kapasitas, default ke 'N/A'
+            const itemImage = productImage.src; // Ambil URL gambar produk saat ini
+            const quantity = 1; // Untuk contoh ini, kita tambahkan 1 item setiap kali klik
+
+            // Cek apakah item dengan ID dan kapasitas yang sama sudah ada di keranjang
+            const existingItemIndex = cart.findIndex(
+                cartItem => cartItem.id === itemId && cartItem.capacity === selectedCapacity
+            );
+
+            if (existingItemIndex > -1) {
+                // Jika sudah ada, tambahkan kuantitasnya
+                cart[existingItemIndex].quantity += quantity;
+            } else {
+                // Jika belum ada, tambahkan sebagai item baru
+                cart.push({
+                    id: itemId,
+                    name: itemName,
+                    price: itemPrice,
+                    capacity: selectedCapacity,
+                    image: itemImage,
+                    quantity: quantity
+                    // Anda bisa menambahkan properti lain seperti variant_id jika perlu
+                });
+            }
+
+            // Simpan kembali keranjang yang sudah diperbarui ke localStorage
+            localStorage.setItem('shoppingCart', JSON.stringify(cart));
+
+            // Beri notifikasi ke pengguna (opsional)
+            alert(`"${itemName}" (Kapasitas: ${selectedCapacity}) telah ditambahkan ke keranjang!`);
+
+            // Arahkan pengguna ke halaman keranjang
+            window.location.href = '/cartPembeli'; // Pastikan URL ini sesuai dengan route halaman keranjang Anda
         });
-
-
         // Tangani tautan navigasi untuk menampilkan/menyembunyikan bagian
         const detailProdukLink = document.getElementById('detailProdukLink');
         const diskusiLink = document.getElementById('diskusiLink');
