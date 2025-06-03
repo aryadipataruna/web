@@ -65,7 +65,7 @@
 
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
-            <div class="text-2xl font-bold text-green-600 mb-2 sm:mb-0">ReUseMart</div>
+        <a href="/home" class="text-2xl font-bold text-green-600 mb-2 sm:mb-0 hover:text-green-700 transition-colors">ReUseMart</a>
             <div class="w-full sm:w-1/2 lg:w-1/3">
                 <div class="relative">
                     <input type="text" placeholder="Cari di TokoKita" class="w-full py-2 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -196,7 +196,7 @@
                     }));
                 } catch (e) {
                     console.error("Error parsing cart from localStorage:", e);
-                    localStorage.removeItem('shoppingCart'); // Hapus data korup
+                    localStorage.removeItem('shoppingCart');
                     return []; // Kembalikan array kosong jika parsing gagal
                 }
             }
@@ -580,10 +580,12 @@
 
         // ========== 4. EVENT HANDLERS & LOGIC ==========
 
-        function handleCartItemCheck(itemId, checked) {
+        function handleCartItemCheck(itemId, isChecked) { // 'isChecked' adalah boolean dari event.target.checked
             const item = state.cartItems.find(i => i.id === itemId);
-            if (item) item.checked = checked;
-            saveCartToLocalStorage(); // MODIFIKASI: Simpan perubahan
+            if (item) {
+                item.checked = isChecked; // Pastikan isChecked adalah boolean
+            }
+            saveCartToLocalStorage();
             renderCartListDOM();
             renderCartSummaryDOM();
         }
@@ -614,23 +616,36 @@
         }
 
         function handleRemoveSelectedItems() {
+
+            console.log("--- DEBUG MASUK handleRemoveSelectedItems ---");
+            console.log("Jumlah total item di keranjang (state.cartItems.length): " + state.cartItems.length);
+
+            let berapaYangTercentang = 0;
+            if (state.cartItems.length > 1) {
+                console.log("Detail status 'checked' setiap item:");
+                state.cartItems.forEach((item, index) => {
+                    console.log(`Item ke-<span class="math-inline">\{index\}\: ID\=</span>{item.id}, Nama='<span class="math-inline">\{item\.name\}', Apakah Tercentang \(item\.checked\)\=</span>{item.checked}`);
+                    if (item.checked === true) { // Pastikan perbandingan dengan boolean true
+                        berapaYangTercentang++;
+                    }
+                });
+            } else {
+                console.log("Keranjang (state.cartItems) kosong.");
+            }
+            console.log("Jumlah item yang BENAR-BENAR tercentang (berdasarkan loop di atas): " + berapaYangTercentang);
+            console.log("--- AKHIR DEBUG ---");
+
+            // Kode asli Anda:
             const selectedItemsCount = state.cartItems.filter(item => item.checked).length;
-            if (selectedItemsCount === 0) {
+            // Anda juga bisa log hasil ini:
+            // console.log("selectedItemsCount hasil dari .filter(): " + selectedItemsCount);
+
+            if (selectedItemsCount === 0) { // atau if (berapaYangTercentang === 0)
                 alert("Tidak ada item yang dipilih untuk dihapus.");
                 return;
             }
-            if (confirm(`Anda yakin ingin menghapus ${selectedItemsCount} item yang dipilih?`)) {
-                state.cartItems = state.cartItems.filter(item => !item.checked);
-                saveCartToLocalStorage(); // MODIFIKASI: Simpan perubahan
-                renderCartListDOM();
-                renderCartSummaryDOM();
-                if (!document.getElementById('checkoutSection').classList.contains('hidden') && !state.checkout.orderConfirmed) {
-                    renderCheckoutOrderItemsDOM();
-                    renderCheckoutSummaryDOM();
-                }
-            }
+            // ... sisa kode fungsi Anda ...
         }
-
 
         function handleUpdateQuantity(itemId, action) {
             const item = state.cartItems.find(i => i.id === itemId);
@@ -775,7 +790,7 @@
 
             if (timerDisplay) {
                 timerDisplay.classList.remove('hidden');
-                let timeLeft = 1 * 60 * 60; // 1 jam dalam detik
+                let timeLeft = 5;
 
                 clearInterval(state.checkout.paymentTimerInterval);
                 clearTimeout(state.checkout.paymentTimeout);
@@ -934,10 +949,12 @@
 
 
         // ========== 5. BIND EVENTS ==========
+        // ========== 5. BIND EVENTS ==========
         function bindCartEvents() {
             const cartContainer = document.getElementById('cartListContainer');
             if (!cartContainer) return;
 
+            // Event listener untuk perubahan (misalnya, checkbox)
             cartContainer.addEventListener('change', (e) => {
                 if (e.target.id === 'selectAllItems') {
                     handleSelectAllItems(e.target.checked);
@@ -950,21 +967,24 @@
                 }
             });
 
+            // Event listener untuk klik (misalnya, tombol)
             cartContainer.addEventListener('click', (e) => {
-                const targetButton = e.target.closest('button');
-                if (!targetButton) return;
+                const targetButton = e.target.closest('button'); // Dapatkan elemen button terdekat
+                if (!targetButton) return; // Jika yang diklik bukan button atau di dalam button
 
-                if (targetButton.id === 'removeSelectedBtn') {
-                    handleRemoveSelectedItems();
+                if (targetButton.id === 'removeSelectedBtn') { // Ini adalah tombol "Hapus" (selected)
+                    handleRemoveSelectedItems(); // Panggil fungsi yang sudah dilengkapi di atas
                 } else if (targetButton.classList.contains('action-btn') && targetButton.dataset.action === 'remove-item') {
-                     const itemId = targetButton.dataset.id;
-                     const itemToRemove = state.cartItems.find(i => i.id === itemId);
-                     if (itemToRemove && confirm(`Anda yakin ingin menghapus "${itemToRemove.name}" dari keranjang?`)) {
-                        handleRemoveItem(itemId);
+                    // Ini untuk tombol hapus per item (ikon sampah di setiap baris item)
+                    const itemId = targetButton.dataset.id;
+                    const itemToRemove = state.cartItems.find(i => i.id === itemId);
+                    if (itemToRemove && confirm(`Anda yakin ingin menghapus "${itemToRemove.name}" dari keranjang?`)) {
+                        handleRemoveItem(itemId); // Panggil fungsi hapus satu item
                     }
                 } else if (targetButton.classList.contains('quantity-btn')) {
                     handleUpdateQuantity(targetButton.dataset.id, targetButton.dataset.action);
                 }
+                // Anda bisa menambahkan else if untuk action-btn wishlist di sini jika perlu
             });
         }
 
