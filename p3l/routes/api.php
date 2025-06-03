@@ -1,23 +1,20 @@
 <?php
 
-use App\Http\Controllers\PembeliController;
-use App\Http\Controllers\PegawaiController;
-use App\Http\Controllers\PenitipController;
-use App\Http\Controllers\OrganisasiController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
+use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\KomisiController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MerchandiseController;
-use App\Http\Controllers\PenjualanController;
+use App\Http\Controllers\OrganisasiController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PembeliController;
+use App\Http\Controllers\PenitipanController;
+use App\Http\Controllers\PenitipController;
 use App\Http\Controllers\PenukaranController;
 use App\Http\Controllers\ReqDonasiController;
-use App\Http\Controllers\DonasiController;
-use App\Http\Controllers\LoginController; 
-use App\Http\Controllers\PenitipanController;
-
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -38,7 +35,6 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 // Route::post('/pegawai/login', [PegawaiController::class, 'login'])->name('pegawai.login');
 // Route::post('/organisasi/login', [OrganisasiController::class, 'login'])->name('organisasi.login');
 
-
 // General Authenticated Routes (for any authenticated user type)
 Route::middleware('auth:sanctum')->group(function () {
     // Get authenticated user info (handled by LoginController)
@@ -49,55 +45,47 @@ Route::middleware('auth:sanctum')->group(function () {
     // You can add other routes here that are accessible to ANY authenticated user
 });
 
-
-// Authenticated Routes Grouped by User Type (Requires a token from the specific user type)
-
-// Authenticated Routes for Pegawai
 Route::middleware('auth:sanctum')->group(function () {
-    // Pegawai specific routes (can be accessed by an authenticated Pegawai)
-    Route::get('/pegawai/authenticated', [PegawaiController::class, 'index'])->name('pegawai.index.authenticated'); // Renamed for clarity
-    Route::get('/pegawai/authenticated/{id}', [PegawaiController::class, 'show'])->name('pegawai.show.authenticated'); // Renamed for clarity
-    Route::post('/pegawai/create/authenticated', [PegawaiController::class, 'store'])->name('pegawai.create.authenticated'); // Renamed
-    Route::put('/pegawai/update/authenticated/{id}', [PegawaiController::class, 'update'])->name('pegawai.update.authenticated'); // Renamed
+
+    Route::get('/pegawai/authenticated', [PegawaiController::class, 'index'])->name('pegawai.index.authenticated');                   // Renamed for clarity
+    Route::get('/pegawai/authenticated/{id}', [PegawaiController::class, 'show'])->name('pegawai.show.authenticated');                // Renamed for clarity
+    Route::post('/pegawai/create/authenticated', [PegawaiController::class, 'store'])->name('pegawai.create.authenticated');          // Renamed
+    Route::put('/pegawai/update/authenticated/{id}', [PegawaiController::class, 'update'])->name('pegawai.update.authenticated');     // Renamed
     Route::delete('/pegawai/delete/authenticated/{id}', [PegawaiController::class, 'destroy'])->name('pegawai.delete.authenticated'); // Renamed
-    // Logout route is handled in the general authenticated group above
-    // Route::post('pegawai/logout', [PegawaiController::class, 'logout'])->name('pegawai.logout'); // REMOVED
+
 });
 
 // Authenticated Routes for Pembeli
 Route::middleware('auth:sanctum')->group(function () {
-    // Pembeli specific routes (can be accessed by an authenticated Pembeli)
-    Route::get('/pembeli/authenticated', [PembeliController::class, 'index'])->name('pembeli.index.authenticated'); // Renamed for clarity
-    Route::get('/pembeli/authenticated/{id}', [PembeliController::class, 'show'])->name('pembeli.show.authenticated'); // Renamed for clarity
-    Route::post('/pembeli/create/authenticated', [PembeliController::class, 'store'])->name('pembeli.create.authenticated'); // Renamed
-    Route::put('/pembeli/update/authenticated/{id}', [PembeliController::class, 'update'])->name('pembeli.update.authenticated'); // Renamed
+
+    Route::get('/pembeli/authenticated', [PembeliController::class, 'index'])->name('pembeli.index.authenticated');                   // Renamed for clarity
+    Route::get('/pembeli/authenticated/{id}', [PembeliController::class, 'show'])->name('pembeli.show.authenticated');                // Renamed for clarity
+    Route::post('/pembeli/create/authenticated', [PembeliController::class, 'store'])->name('pembeli.create.authenticated');          // Renamed
+    Route::put('/pembeli/update/authenticated/{id}', [PembeliController::class, 'update'])->name('pembeli.update.authenticated');     // Renamed
     Route::delete('/pembeli/delete/authenticated/{id}', [PembeliController::class, 'destroy'])->name('pembeli.delete.authenticated'); // Renamed
-     // Logout route is handled in the general authenticated group above
-    // Route::post('pembeli/logout', [PembeliController::class, 'logout'])->name('pembeli.logout'); // REMOVED
+
 });
 
 // Authenticated Routes for Penitip
 Route::middleware('auth:sanctum')->group(function () {
-    // Penitip specific routes (can be accessed by an authenticated Penitip)
-    Route::get('/penitip/authenticated', [PenitipController::class, 'index'])->name('penitip.index.authenticated'); // Renamed for clarity
-    Route::get('/penitip/authenticated/{id}', [PenitipController::class, 'show'])->name('penitip.show.authenticated'); // Renamed for clarity
-    Route::post('/penitip/create/authenticated', [PenitipController::class, 'store'])->name('penitip.create.authenticated'); // Renamed
-    Route::put('/penitip/update/authenticated/{id}', [PenitipController::class, 'update'])->name('penitip.update.authenticated'); // Renamed
-    Route::delete('/penitip/delete/authenticated/{id}', [PenitipController::class, 'destroy'])->name('penitip.delete.authenticated'); // Renamed
-     // Logout route is handled in the general authenticated group above
-    // Route::post('penitip/logout', [PenitipController::class, 'logout')->name('penitip.logout'); // REMOVED
+
+    Route::get('/penitip/authenticated', [PenitipController::class, 'index'])->name('penitip.index.authenticated');
+    Route::get('/penitip/authenticated/{id}', [PenitipController::class, 'show'])->name('penitip.show.authenticated');
+    Route::post('/penitip/create/authenticated', [PenitipController::class, 'store'])->name('penitip.create.authenticated');
+    Route::put('/penitip/update/authenticated/{id}', [PenitipController::class, 'update'])->name('penitip.update.authenticated');
+    Route::delete('/penitip/delete/authenticated/{id}', [PenitipController::class, 'destroy'])->name('penitip.delete.authenticated');
+
 });
 
 // Authenticated Routes for Organisasi
 Route::middleware('auth:sanctum')->group(function () {
-    // Organisasi specific routes (can be accessed by an authenticated Organisasi)
-    Route::get('/organisasi/authenticated', [OrganisasiController::class, 'index'])->name('organisasi.index.authenticated'); // Renamed for clarity
-    Route::get('/organisasi/authenticated/{id}', [OrganisasiController::class, 'show'])->name('organisasi.show.authenticated'); // Renamed for clarity
-    Route::post('/organisasi/create/authenticated', [OrganisasiController::class, 'store'])->name('organisasi.create.authenticated'); // Renamed
-    Route::put('/organisasi/update/authenticated/{id}', [OrganisasiController::class, 'update'])->name('organisasi.update.authenticated'); // Renamed
+
+    Route::get('/organisasi/authenticated', [OrganisasiController::class, 'index'])->name('organisasi.index.authenticated');                   // Renamed for clarity
+    Route::get('/organisasi/authenticated/{id}', [OrganisasiController::class, 'show'])->name('organisasi.show.authenticated');                // Renamed for clarity
+    Route::post('/organisasi/create/authenticated', [OrganisasiController::class, 'store'])->name('organisasi.create.authenticated');          // Renamed
+    Route::put('/organisasi/update/authenticated/{id}', [OrganisasiController::class, 'update'])->name('organisasi.update.authenticated');     // Renamed
     Route::delete('/organisasi/delete/authenticated/{id}', [OrganisasiController::class, 'destroy'])->name('organisasi.delete.authenticated'); // Renamed
-    // Logout route is handled in the general authenticated group above
-    // Route::post('organisasi/logout', [OrganisasiController::class, 'logout'])->name('organisasi.logout'); // REMOVED
+
 });
 
 Route::get('/alamat', [AlamatController::class, 'index'])->name('alamat.index');
@@ -115,6 +103,7 @@ Route::delete('/barang/delete/{id}', [BarangController::class, 'destroy'])->name
 Route::put('/barang/{id}/extend', [BarangController::class, 'extend'])->name('barang.extend');
 
 Route::get('/nota-penitipan/{no_nota}/pdf', [PenitipanController::class, 'generateNotaPdf'])->name('nota.generate');
+Route::get('/penjualan/nota/{nomor_nota}/pdf', [PenjualanController::class, 'generateNotaPdf'])->name('penjualan.nota.pdf');
 
 Route::get('/diskusi', [DiskusiController::class, 'index'])->name('diskusi.index');
 Route::get('/diskusi/{id}', [DiskusiController::class, 'show'])->name('diskusi.show');

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegistrationHandlerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,7 +40,13 @@ Route::get('/detailBarang/{id}', function ($id) {
     return view('detailBarangPage', ['id' => $id]);
 })->name('detailBarang');
 
+Route::get('/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
 
+Route::get('/detailBarang/cartPembeli/detailPemesanan', function () {
+    return view('detailPemesanan');
+})->name('order');
 
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
