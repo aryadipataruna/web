@@ -44,9 +44,9 @@ Route::get('/historyPage', function () {
     return view('history.historyPage');
 })->name('historyPage');
 
-Route::get('/cart', function () {
-    return view('cart.cartPage');
-})->name('cartPage');
+Route::get('/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
 
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
