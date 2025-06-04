@@ -52,6 +52,10 @@ Route::get('/cartPembeli', function () {
     return view('cart');
 })->name('cartPembeli');
 
+Route::get('/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
+
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
 // })->name('passwordEmail');
