@@ -1,166 +1,177 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Donasi;
-use Illuminate\Http\Request;
+use Exception;
+use Illuminate\Http\Request; // Import Validator
+use Illuminate\Support\Facades\Validator;
+// Import Exception
 
 class DonasiController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan semua data donasi.
      */
     public function index()
     {
         try {
-            $data = Donasi::all();
+            $data = Donasi::orderBy('tgl_donasi', 'desc')->get();
 
             return response()->json([
-                "status" => true,
-                "message" => "Getting all Donasi successful!",
-                "data" => $data
+                "status"  => true,
+                "message" => "Berhasil mendapatkan semua data Donasi!",
+                "data"    => $data,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
-                "status" => false,
-                "message" => "Getting all Donasi failed!!!",
-                "data" => $e->getMessage()
-            ], 400);
+                "status"  => false,
+                "message" => "Gagal mendapatkan data Donasi!",
+                "error"   => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan data donasi baru.
      */
     public function store(Request $request)
     {
+        // PERUBAHAN 1: Sesuaikan validasi dengan nama kolom di database Anda
+        $validator = Validator::make($request->all(), [
+            'kode_produk'   => 'required|string',
+            'nama_produk'   => 'required|string',
+            'id_penitip'    => 'required|string',
+            'nama_penitip'  => 'required|string',
+            'tgl_donasi'    => 'required|date',
+            'organisasi'    => 'required|string',
+            'nama_penerima' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status"  => false,
+                "message" => "Validasi Gagal!",
+                "errors"  => $validator->errors(),
+            ], 422);
+        }
+
         try {
-            // Validate incoming request data, exclude ID_DONASI as it will be generated
-            $validateData = $request->validate([
-                'ID_ORGANISASI' => 'required|string', // NOT NULL in DB
-                'NAMA_BARANG_DONASI' => 'required|string', // NOT NULL in DB
-                'TGL_DONASI' => 'required|date', // NOT NULL in DB
-                'NAMA_PENERIMA' => 'required|string', // NOT NULL in DB
-            ]);
-
-            // Generate unique ID_DONASI (e.g., DON001, DON002, ...)
-            // Find the last Donasi record to get the highest ID number
-            $lastDonasi = Donasi::orderBy('ID_DONASI', 'desc')->first();
-
-            // Extract the numeric part from the last ID, or start with 0 if no records exist
-            // Assumes ID format is DON + 3 digits
-            $lastIdNumber = $lastDonasi ? (int) substr($lastDonasi->ID_DONASI, 3) : 0;
-
-            // Increment the number for the new ID
-            $nextIdNumber = $lastIdNumber + 1;
-
-            // Format the new ID with the prefix 'DON' and pad with leading zeros to 3 digits
-            $generatedId = 'DON' . str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
-
-            // Create a new Donasi instance and set the generated ID and other data
-            $donasi = new Donasi($validateData); // Fill other attributes using mass assignment
-            $donasi->ID_DONASI = $generatedId; // Manually set the generated primary key
-            $donasi->save(); // Save the model to the database
-
+            // PERUBAHAN 2: Hapus logika pembuatan ID manual.
+            // Gunakan metode create() yang lebih sederhana karena ID sudah auto-increment.
+            $donasi = Donasi::create($validator->validated());
 
             return response()->json([
-                "status" => true,
-                "message" => "Donasi successfully created!",
-                "data" => $donasi,
-            ], 201); // Use 201
-        } catch (\Exception $e) {
+                "status"  => true,
+                "message" => "Donasi berhasil dibuat!",
+                "data"    => $donasi,
+            ], 201);
+        } catch (Exception $e) {
             return response()->json([
-                "status" => false,
-                "message" => "Failed at creating the Donasi!",
-                "data" => $e->getMessage(),
-            ], 400);
+                "status"  => false,
+                "message" => "Gagal membuat Donasi!",
+                "error"   => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan satu data donasi spesifik.
      */
     public function show($id)
     {
         try {
             $data = Donasi::find($id);
 
-            if (!$data) {
-                return response()->json(['message' => 'Donasi ID not found!!!'], 404);
+            if (! $data) {
+                return response()->json(['message' => 'ID Donasi tidak ditemukan!'], 404);
             }
 
             return response()->json([
-                "status" => true,
-                "message" => "Getting the selected Donasi successful!",
-                "data" => $data
+                "status"  => true,
+                "message" => "Berhasil mendapatkan data Donasi!",
+                "data"    => $data,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
-                "status" => false,
-                "message" => "Getting the selected Donasi failed!!!",
-                "data" => $e->getMessage()
-            ], 400);
+                "status"  => false,
+                "message" => "Gagal mendapatkan data Donasi!",
+                "error"   => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui data donasi.
      */
     public function update(Request $request, $id)
     {
+        // PERUBAHAN 3: Sesuaikan validasi untuk update
+        $validator = Validator::make($request->all(), [
+            'kode_produk'   => 'sometimes|required|string',
+            'nama_produk'   => 'sometimes|required|string',
+            'id_penitip'    => 'sometimes|required|string',
+            'nama_penitip'  => 'sometimes|required|string',
+            'tgl_donasi'    => 'sometimes|required|date',
+            'organisasi'    => 'sometimes|required|string',
+            'nama_penerima' => 'sometimes|required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                "status"  => false,
+                "message" => "Validasi Gagal!",
+                "errors"  => $validator->errors(),
+            ], 422);
+        }
+
         try {
             $data = Donasi::find($id);
 
-            if (!$data) {
-                return response()->json(['message' => 'Donasi ID not found!!!'], 404);
+            if (! $data) {
+                return response()->json(['message' => 'ID Donasi tidak ditemukan!'], 404);
             }
 
-            $validateData = $request->validate([
-                'TGL_DONASI' => 'required|date',
-                'NAMA_PENERIMA' => 'required|string',
-            ]);
-
-            $data->update($validateData);
+            $data->update($validator->validated());
 
             return response()->json([
-                "status" => true,
-                "message" => "Donasi successfully updated!",
-                "data" => $data
+                "status"  => true,
+                "message" => "Donasi berhasil diperbarui!",
+                "data"    => $data,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
-                "status" => false,
-                "message" => "Failed at updating the Donasi!!!",
-                "data" => $e->getMessage()
-            ], 400);
+                "status"  => false,
+                "message" => "Gagal memperbarui Donasi!",
+                "error"   => $e->getMessage(),
+            ], 500);
         }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus data donasi.
      */
     public function destroy($id)
     {
         try {
             $data = Donasi::find($id);
 
-            if (!$data) {
-                return response()->json(['message' => 'Donasi ID not found!!!'], 404);
+            if (! $data) {
+                return response()->json(['message' => 'ID Donasi tidak ditemukan!'], 404);
             }
 
             $data->delete();
 
             return response()->json([
-                "status" => true,
-                "message" => "Successfully deleted the Donasi!",
-                "data" => $data
+                "status"  => true,
+                "message" => "Berhasil menghapus Donasi!",
+                "data"    => $data,
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
-                "status" => false,
-                "message" => "Failed to delete the Donasi!!!",
-                "data" => $e->getMessage()
-            ], 400);
+                "status"  => false,
+                "message" => "Gagal menghapus Donasi!",
+                "error"   => $e->getMessage(),
+            ], 500);
         }
     }
 }
