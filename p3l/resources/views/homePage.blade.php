@@ -417,6 +417,9 @@
             <a href="/historyPage" class="nav-link text-light me-2">
                 <i class="fa fa-clock-rotate-left me-1"></i>History
             </a>
+            <a href="/ratingPage" class="nav-link text-light me-2">
+                <i class="fa fa-person me-1"></i>Best Seller
+            </a>
             <a href="/login-regis" class="nav-link text-light">
                 <i class="fa fa-user me-1"></i>Masuk
             </a>

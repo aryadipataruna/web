@@ -93,38 +93,32 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         try {
-            // Validate incoming request data, exclude id_barang as it will be generated
             $validateData = $request->validate([
-                'id_penitip' => 'required|string', // NOT NULL in DB
-                'id_diskusi' => 'nullable|string', // NULL in DB
-                'id_pegawai' => 'required|string', // NOT NULL in DB
-                'nama_barang' => 'required|string', // NOT NULL in DB
-                'deskripsi_barang' => 'required|string', // NOT NULL in DB
-                'kategori' => 'required|string', // NOT NULL in DB
-                'harga_barang' => 'required|numeric', // NOT NULL in DB
-                'tgl_titip' => 'nullable|date', // NOT NULL in DB
-                'tgl_laku' => 'nullable|date', // NULL in DB
+                'id_penitip' => 'required|string', 
+                'id_diskusi' => 'nullable|string', 
+                'id_pegawai' => 'required|string', 
+                'nama_barang' => 'required|string', 
+                'deskripsi_barang' => 'required|string', 
+                'kategori' => 'required|string', 
+                'harga_barang' => 'required|numeric', 
+                'tgl_titip' => 'nullable|date', 
+                'tgl_laku' => 'nullable|date', 
                 'tgl_akhir' => 'nullable|date',
-                'garansi' => 'required|boolean', // NOT NULL in DB (tinyint)
-                'perpanjangan' => 'nullable|boolean', // NOT NULL in DB (tinyint)
-                'count_perpanjangan' => 'nullable|integer', // NOT NULL in DB
-                'status' => 'nullable|string', // NULL in DB
+                'garansi' => 'required|boolean', 
+                'perpanjangan' => 'nullable|boolean',  
+                'count_perpanjangan' => 'nullable|integer', 
+                'status' => 'nullable|string', 
                 'gambar_barang' => 'required|string',
-                'bukti_pembayaran' => 'nullable|string', // NOT NULL in DB
+                'bukti_pembayaran' => 'nullable|string', 
             ]);
 
-             // Generate unique id_barang (e.g., BAR001, BAR002, ...)
-            // Find the last Barang record to get the highest ID number
+             
             $lastBarang = Barang::orderBy('id_barang', 'desc')->first();
 
-            // Extract the numeric part from the last ID, or start with 0 if no records exist
-            // Assumes ID format is BAR + 3 digits
             $lastIdNumber = $lastBarang ? (int) substr($lastBarang->id_barang, 3) : 0;
 
-            // Increment the number for the new ID
             $nextIdNumber = $lastIdNumber + 1;
 
-            // Format the new ID with the prefix 'BAR' and pad with leading zeros to 3 digits
             $generatedId = 'BAR' . str_pad($nextIdNumber, 3, '0', STR_PAD_LEFT);
 
             $barang->tgl_titip = Carbon::now()->toDateString(); // Tanggal hari ini
@@ -365,14 +359,13 @@ class BarangController extends Controller
             ], 400);
         }
 
-        // Menggunakan updateOrCreate untuk membuat atau memperbarui rating
         $rating = Rating::updateOrCreate(
-            ['id_barang' => $idBarang], // Kriteria pencarian: cari rating berdasarkan id_barang
+            ['id_barang' => $idBarang], 
             [
                 'id_penitip' => $idPenitip,
                 'rating'     => $nilaiRating,
-                'nama_barang'=> $barang->nama_barang // Mengambil nama barang dari objek barang
-            ] // Data yang akan di-update atau dibuat
+                'nama_barang'=> $barang->nama_barang 
+            ] 
         );
 
         $message = $rating->wasRecentlyCreated ? 'Terima kasih telah memberi rating!' : 'Rating Anda berhasil diperbarui!';

@@ -33,6 +33,10 @@ Route::get('/adminPageOwner', function () {
     return view('admin.adminPageOwner');
 })->name('adminPageOwner');
 
+Route::get('/adminPageCS', function () {
+    return view('admin.adminPageCS');
+})->name('adminPageCS');
+
 Route::match(['GET', 'POST', 'PUT'], '/adminPageGudang', function () {
     return view('admin.adminPageGudang');
 })->name('adminPageGudang');
@@ -44,6 +48,10 @@ Route::get('/detailBarang/{id}', function ($id) {
 Route::get('/historyPage', function () {
     return view('history.historyPage');
 })->name('historyPage');
+
+Route::get('/ratingPage', function () {
+    return view('ratingPage');
+})->name('ratingPage');
 
 
 

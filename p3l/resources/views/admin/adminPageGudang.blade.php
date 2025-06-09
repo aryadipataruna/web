@@ -303,7 +303,7 @@
                                         <input type="hidden" id="update_id_barang" name="id_barang">
 
                                         <div class="mb-3">
-                                            <label for="update_id_penitip" class="form-label">ID Penitip:</label>
+                                            <label for="update_id_penitip" class="form-label">Nama Penitip:</label>
                                             <input type="text" class="form-control" id="update_id_penitip" name="id_penitip" required>
                                         </div>
 
@@ -439,8 +439,6 @@
             return `${year}-${month}-${day}`;
         }
 
-        // --- CRUD Operations ---
-
         // Function to fetch and display barang data
         async function fetchBarang(searchTerm = '') {
             try {
@@ -546,9 +544,9 @@
 
                 if (response.ok && result.status) {
                     alert('Barang added successfully! ID: ' + result.data.id_barang);
-                    addBarangModal.hide(); // Hide Bootstrap modal
-                    addBarangForm.reset(); // Clear form
-                    fetchBarang(); // Refresh table data
+                    addBarangModal.hide(); 
+                    addBarangForm.reset(); 
+                    fetchBarang(); 
                 } else {
                     const errorMessage = result.message || 'Unknown error occurred.';
                     const errorDetails = result.data ? '\nDetails: ' + JSON.stringify(result.data) : '';

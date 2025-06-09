@@ -618,7 +618,6 @@
                     // Pastikan respons memiliki properti 'data' jika API Anda mengembalikannya dalam bentuk { "data": {...} }
                     const item = itemDetail.data || itemDetail; // Sesuaikan dengan struktur respons API Anda
 
-                    // Panggil API rating untuk mendapatkan rating terbaru
                     let rating = 0;
                     try {
                         const ratingResponse = await fetch(`/api/barang/${itemId}/rating`, {
@@ -730,7 +729,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer ' + token
                     },
                     body: JSON.stringify({ item_id: itemId, rating: rating })
                 });

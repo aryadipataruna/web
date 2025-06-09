@@ -399,7 +399,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTFyUHNkjX/dQfLqa/Yy7zm2rJz5s2PzR1rX5z/K66T9t/Q5T4S5Y" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlcoJoZ/z4nGSsNqF0/mHp/rS/sQ4pQ1Q1h/oI6" crossorigin="anonymous"></script>
 
     <script>
@@ -587,7 +587,7 @@
                     } else if (result.data.role === 'gudang') {
                         window.location.href = '/adminPageGudang';
                     } else if (result.data.role === 'customer service') {
-                        window.location.href = '/csDashboard';
+                        window.location.href = '/adminPageCS';
                     } else if (result.data.role === 'hunter') {
                         window.location.href = '/hunterDashboard';
                     } else if (result.data.role === 'kurir') {

@@ -376,13 +376,13 @@
     </div>
 
     <div class="container">
-        <h1 class="page-title">Dasbor Owner - ReUse Mart</h1>
+        <h1 class="page-title">Dasbor Owner - Laporan ReUse Mart</h1>
 
         <div class="dashboard-grid">
             <div class="dashboard-card">
-                <h3>Manajemen Pegawai</h3>
-                <p>Kelola data pegawai, jabatan, dan performa.</p>
-                <a href="#">Lihat Pegawai</a>
+                <h3>Penjualan Bulanan Keseluruhan</h3>
+                <p>Laporan Penjualan Bulanan Keseluruhan PDF.</p>
+                <a href="/api/laporan-penjualan-bulanan/2025">Laporan Penjualan Bulanan</a>
             </div>
             <div class="dashboard-card">
                 <h3>Manajemen Organisasi</h3>

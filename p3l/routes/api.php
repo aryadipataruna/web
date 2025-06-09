@@ -17,6 +17,9 @@ use App\Http\Controllers\DonasiController;
 use App\Http\Controllers\LoginController; 
 use App\Http\Controllers\PenitipanController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\LaporanPenjualanController;
+use App\Http\Controllers\LaporanKomisiController;
+use App\Http\Controllers\LaporanStokGudangController;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,7 +77,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('pembeli/logout', [PembeliController::class, 'logout'])->name('pembeli.logout'); // REMOVED
 });
 
-// Authenticated Routes for Penitip
 Route::middleware('auth:sanctum')->group(function () {
     // Penitip specific routes (can be accessed by an authenticated Penitip)
     Route::get('/penitip/authenticated', [PenitipController::class, 'index'])->name('penitip.index.authenticated'); // Renamed for clarity
@@ -98,6 +100,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('organisasi/logout', [OrganisasiController::class, 'logout'])->name('organisasi.logout'); // REMOVED
 });
 
+Route::get('/penitip/{id}/rating', [PenitipController::class, 'showPenitipRating']);
+
 Route::get('/alamat', [AlamatController::class, 'index'])->name('alamat.index');
 Route::get('/alamat/{id}', [AlamatController::class, 'show'])->name('alamat.show');
 Route::post('/alamat/create', [AlamatController::class, 'store'])->name('alamat.store');
@@ -115,6 +119,9 @@ Route::delete('/barang/delete/{id}', [BarangController::class, 'destroy'])->name
 Route::put('/barang/{id}/extend', [BarangController::class, 'extend'])->name('barang.extend');
 
 Route::get('/nota-penitipan/{no_nota}/pdf', [PenitipanController::class, 'generateNotaPdf'])->name('nota.generate');
+Route::get('/laporan-penjualan-bulanan/{tahun?}', [LaporanPenjualanController::class, 'generateLaporanPenjualanPdf']);
+Route::get('/laporan-komisi', [LaporanKomisiController::class, 'generateLaporanKomisi'])->name('laporan.komisi');
+Route::get('/laporan-stok-gudang', [LaporanStokGudangController::class, 'generateLaporanStok'])->name('laporan.stok.gudang');
 
 Route::get('/diskusi', [DiskusiController::class, 'index'])->name('diskusi.index');
 Route::get('/diskusi/{id}', [DiskusiController::class, 'show'])->name('diskusi.show');

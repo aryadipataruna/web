@@ -161,6 +161,32 @@ class PenitipController extends Controller
         }
     }
 
+    public function showbyName($id)
+    {
+        try {
+            $data = Penitip::find($id);
+
+            if (!$data) {
+                return response()->json(['message' => 'Penitip ID not found!!!'], 404);
+            }
+
+             // Hide password in the response
+            // $data->makeHidden('PASSWORD_PENITIP');
+
+            return response()->json([
+                "status" => true,
+                "message" => "Getting the selected Penitip successful!",
+                "data" => $data
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Getting the selected Penitip failed!!!",
+                "data" => $e->getMessage()
+            ], 400);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -246,6 +272,67 @@ class PenitipController extends Controller
                 "message" => "Failed to delete the Penitip!!!",
                 "data" => $e->getMessage()
             ], 400);
+        }
+    }
+
+    public function showPenitipRating($id)
+    {
+        // Temukan barang berdasarkan ID
+        $penitip = Penitip::find($id);
+
+        // Jika barang tidak ditemukan
+        if (!$$penitip) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Penitip tidak ditemukan.'
+            ], 404);
+        }
+
+        // Ambil rating dari relasi di model Barang (hasOne)
+        $ratingData = $penitip->rating;
+
+        // Jika tidak ada rating yang ditemukan untuk barang ini di tabel 'ratings'
+        if (!$ratingData) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang ini belum memiliki rating.',
+                'rating'  => null // Mengembalikan null jika belum ada rating
+            ], 200);
+        }
+
+        // Jika rating ditemukan
+        return response()->json([
+            'success' => true,
+            'message' => 'Rating barang ditemukan.',
+            'rating'  => $penitip->rating 
+        ]);
+    }
+
+    public function getAllPenitipsForDisplay()
+    {
+        try {
+            $penitip = Penitip::all(); // Or Penitip::select('ID_PENITIP', 'NAMA_PENITIP', 'ALAMAT_PENITIP', 'RATING')->get();
+
+            // If you need to attach calculated ratings (from ratings table) or review counts
+            // that are NOT in the 'RATING' column directly, you'd do it here.
+            // But based on our previous discussion, we're using the 'RATING' column.
+            $data = $penitip->map(function($penitip) {
+                return [
+                    'ID_PENITIP' => $penitip->ID_PENITIP,
+                    'NAMA_PENITIP' => $penitip->NAMA_PENITIP,
+                    'ALAMAT_PENITIP' => $penitip->ALAMAT_PENITIP,
+                    'RATING' => $penitip->RATING,
+                ];
+            });
+
+            return response()->json($data);
+
+        } catch (\Exception $e) {
+            Log::error("Error fetching public penitip data: " . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'message' => 'Failed to fetch public penitip data.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
