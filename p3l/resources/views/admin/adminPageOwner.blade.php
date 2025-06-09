@@ -488,11 +488,24 @@
             <span class="close-button correct-reqdonasi-close-button">&times;</span>
             <h2>Konfirmasi Donasi</h2>
             <div id="correctReqDonasiFormErrorMessages" class="form-error-messages"></div>
-            <form id="correctReqDonasiForm">
-                <input type="hidden" id="correctReqDonasiId" name="ID_REQDONASI">
-                <input type="hidden" id="correctReqDonasiIdOrganisasi" name="ID_ORGANISASI">
-                <input type="hidden" id="correctReqDonasiNamaBarang" name="NAMA_BARANG_DONASI">
+            <form id="correctReqDonasiForm" method="POST" action="{{ url('/donasi/konfirmasi-dan-cetak') }}">
+                @csrf <input type="hidden" id="correctReqDonasiId" name="ID_REQDONASI">
+                    <input type="hidden" id="correctReqDonasiIdOrganisasi" name="ID_ORGANISASI">
+                    <input type="hidden" id="correctReqDonasiNamaBarang" name="NAMA_BARANG_DONASI">
 
+                    <input type="hidden" id="hiddenTglDonasi" name="TGL_DONASI">
+
+                    <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
+                    <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
+                    <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
+                    <p><strong>Nama Barang:</strong> <span id="displayReqDonasiNamaBarang"></span></p>
+                    <p><strong>Tanggal Donasi:</strong> <span id="displayTglDonasi"></span> (Otomatis hari ini)</p>
+
+                    <label for="correctNamaPenerima">Nama Penerima Donasi:</label>
+                    <input type="text" id="correctNamaPenerima" name="NAMA_PENERIMA" required>
+
+                    <button type="submit">Konfirmasi & Buat Donasi</button>
+                </form>
                 <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
                 <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
                 <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
