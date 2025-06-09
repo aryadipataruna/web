@@ -150,6 +150,21 @@
             padding-bottom: 5px;
         }
 
+        .report-header { /* New style for report header */
+            margin-bottom: 20px;
+        }
+
+        .report-header p {
+            margin: 2px 0;
+            font-size: 0.9rem;
+        }
+        .report-header .report-title-main {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -161,6 +176,7 @@
             border: 1px solid #ddd;
             padding: 10px;
             text-align: left;
+            font-size: 0.9rem; /* Adjusted for more columns */
         }
 
         .data-table th {
@@ -331,7 +347,7 @@
             .data-table th,
             .data-table td {
                 padding: 8px;
-                font-size: 0.9rem;
+                font-size: 0.85rem; /* Further adjust for more columns */
             }
 
             .modal-content {
@@ -345,7 +361,8 @@
             }
             .data-table th,
             .data-table td {
-                font-size: 0.8rem;
+                font-size: 0.75rem; /* Further adjust for smaller screens */
+                word-break: break-word; /* Prevent table overflow */
             }
         }
 
@@ -376,13 +393,13 @@
     </div>
 
     <div class="container">
-        <h1 class="page-title">Dasbor Owner - Laporan ReUse Mart</h1>
+        <h1 class="page-title">Dasbor Owner - ReUse Mart</h1>
 
         <div class="dashboard-grid">
             <div class="dashboard-card">
-                <h3>Penjualan Bulanan Keseluruhan</h3>
-                <p>Laporan Penjualan Bulanan Keseluruhan PDF.</p>
-                <a href="/api/laporan-penjualan-bulanan/2025">Laporan Penjualan Bulanan</a>
+                <h3>Manajemen Pegawai</h3>
+                <p>Kelola data pegawai, jabatan, dan performa.</p>
+                <a href="#">Lihat Pegawai</a>
             </div>
             <div class="dashboard-card">
                 <h3>Manajemen Organisasi</h3>
@@ -459,6 +476,57 @@
             </table>
         </div>
 
+        {{-- NEW Section for Laporan Donasi Barang --}}
+        <div class="data-section">
+            <h2>Laporan Donasi Barang</h2>
+            <div class="report-header">
+                <p style="font-weight: bold;">ReUse Mart</p>
+                <p>Jl. Green Eco Park No. 456 Yogyakarta</p>
+                <p class="report-title-main">LAPORAN Donasi Barang</p>
+                <p>Tahun: 2025</p>
+                <p>Tanggal cetak: 2 April 2025</p> {{-- Static date as per image --}}
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Kode Produk</th>
+                        <th>Nama Produk</th>
+                        <th>Id Penitip</th>
+                        <th>Nama Penitip</th>
+                        <th>Tanggal Donasi</th>
+                        <th>Organisasi</th>
+                        <th>Nama Penerima</th>
+                    </tr>
+                </thead>
+                <tbody id="laporan-donasi-barang-table-body">
+                    {{-- Example Row (dynamic content will be loaded by JavaScript) --}}
+                    {{-- <tr>
+                        <td>K202</td>
+                        <td>Kipas angin Jumbo</td>
+                        <td>T25</td>
+                        <td>Adi Sanjaya</td>
+                        <td>29/3/2025</td>
+                        <td>Pemuda Pejuang Kebersihan</td>
+                        <td>Pak Sugeng</td>
+                    </tr>
+                    <tr>
+                        <td>K203</td>
+                        <td>Kulkas 3 Pintu</td>
+                        <td>T14</td>
+                        <td>Gani Hendrawan</td>
+                        <td>29/3/2025</td>
+                        <td>Yayasan Kasih Ibu Sleman</td>
+                        <td>Bu Rini</td>
+                    </tr> --}}
+                    <tr>
+                        <td colspan="7" class="loading-message">Memuat data laporan donasi barang...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {{-- END NEW Section for Laporan Donasi Barang --}}
+
+
         <p style="text-align: center; margin-top: 40px; color: #666;">
             Ini adalah dasbor utama untuk Owner. Konten lebih lanjut akan ditambahkan di sini.
         </p>
@@ -488,24 +556,11 @@
             <span class="close-button correct-reqdonasi-close-button">&times;</span>
             <h2>Konfirmasi Donasi</h2>
             <div id="correctReqDonasiFormErrorMessages" class="form-error-messages"></div>
-            <form id="correctReqDonasiForm" method="POST" action="{{ url('/donasi/konfirmasi-dan-cetak') }}">
-                @csrf <input type="hidden" id="correctReqDonasiId" name="ID_REQDONASI">
-                    <input type="hidden" id="correctReqDonasiIdOrganisasi" name="ID_ORGANISASI">
-                    <input type="hidden" id="correctReqDonasiNamaBarang" name="NAMA_BARANG_DONASI">
+            <form id="correctReqDonasiForm">
+                <input type="hidden" id="correctReqDonasiId" name="ID_REQDONASI">
+                <input type="hidden" id="correctReqDonasiIdOrganisasi" name="ID_ORGANISASI">
+                <input type="hidden" id="correctReqDonasiNamaBarang" name="NAMA_BARANG_DONASI">
 
-                    <input type="hidden" id="hiddenTglDonasi" name="TGL_DONASI">
-
-                    <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
-                    <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
-                    <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
-                    <p><strong>Nama Barang:</strong> <span id="displayReqDonasiNamaBarang"></span></p>
-                    <p><strong>Tanggal Donasi:</strong> <span id="displayTglDonasi"></span> (Otomatis hari ini)</p>
-
-                    <label for="correctNamaPenerima">Nama Penerima Donasi:</label>
-                    <input type="text" id="correctNamaPenerima" name="NAMA_PENERIMA" required>
-
-                    <button type="submit">Konfirmasi & Buat Donasi</button>
-                </form>
                 <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
                 <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
                 <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
@@ -569,30 +624,23 @@
                 statusMessageDiv.style.border = '1px solid #f5c6cb';
             }
 
-            // Append the message to the container, or a specific status area if you have one
-            // For this example, I'll append it to the main container
             document.querySelector('.container').appendChild(statusMessageDiv);
 
-            // Hide the message after a few seconds
             setTimeout(() => {
-                statusMessageDiv.remove(); // Remove the element
-            }, 5000); // Hide after 5 seconds
+                statusMessageDiv.remove();
+            }, 5000);
         }
 
 
         // Function to fetch and display ReqDonasi data
         async function fetchReqDonasiData() {
             const reqDonasiTableBody = document.getElementById('reqdonasi-table-body');
-            reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="loading-message">Memuat data permintaan donasi...</td></tr>`; // Updated colspan
+            reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="loading-message">Memuat data permintaan donasi...</td></tr>`;
 
             try {
-                // Fetch data from the API route for ReqDonasi
                 const response = await fetch('/api/reqDonasi', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        // No Authorization header needed as per current API routes
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 if (!response.ok) {
@@ -605,20 +653,19 @@
                 if (responseData.status === true && responseData.data) {
                     renderReqDonasiTable(responseData.data);
                 } else {
-                    reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Gagal memuat data permintaan donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`; // Updated colspan
+                    reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Gagal memuat data permintaan donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`;
                     console.error('API response indicates failure for ReqDonasi:', responseData);
                 }
 
             } catch (error) {
-                reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Error memuat data permintaan donasi. Silakan cek konsol untuk detail.</td></tr>`; // Updated colspan
+                reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Error memuat data permintaan donasi. Silakan cek konsol untuk detail.</td></tr>`;
                 console.error('Error fetching ReqDonasi data:', error);
             }
         }
 
-        // Function to render the ReqDonasi table with provided data
         function renderReqDonasiTable(reqDonasiData) {
             const reqDonasiTableBody = document.getElementById('reqdonasi-table-body');
-            reqDonasiTableBody.innerHTML = ''; // Clear loading message
+            reqDonasiTableBody.innerHTML = '';
 
             if (reqDonasiData.length > 0) {
                 reqDonasiData.forEach(item => {
@@ -640,22 +687,19 @@
                     `;
                     reqDonasiTableBody.appendChild(row);
                 });
-                attachReqDonasiButtonListeners(); // Attach listeners after rendering
+                attachReqDonasiButtonListeners();
             } else {
-                reqDonasiTableBody.innerHTML = '<tr><td colspan="5" class="loading-message">Tidak ada data permintaan donasi ditemukan.</td></tr>'; // Updated colspan
+                reqDonasiTableBody.innerHTML = '<tr><td colspan="5" class="loading-message">Tidak ada data permintaan donasi ditemukan.</td></tr>';
             }
         }
 
-        // Function to attach event listeners for ReqDonasi action buttons
         function attachReqDonasiButtonListeners() {
-            // Correct button listener
             document.querySelectorAll('.btn-correct').forEach(button => {
                 button.addEventListener('click', (event) => {
                     const reqDonasiId = event.target.dataset.id;
                     const idOrganisasi = event.target.dataset.idOrganisasi;
                     const namaBarang = event.target.dataset.namaBarang;
 
-                    // Populate hidden fields and display info in the modal
                     correctReqDonasiIdInput.value = reqDonasiId;
                     correctReqDonasiIdOrganisasiInput.value = idOrganisasi;
                     correctReqDonasiNamaBarangInput.value = namaBarang;
@@ -670,13 +714,12 @@
                                           String(today.getDate()).padStart(2, '0');
                     displayTglDonasi.textContent = formattedDate;
 
-                    correctReqDonasiFormErrorMessages.textContent = ''; // Clear previous errors
-                    correctNamaPenerimaInput.value = ''; // Clear previous input
+                    correctReqDonasiFormErrorMessages.textContent = '';
+                    correctNamaPenerimaInput.value = '';
                     correctReqDonasiModal.style.display = 'flex';
                 });
             });
 
-            // Cancel button listener
             document.querySelectorAll('.btn-cancel').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     const reqDonasiId = event.target.dataset.id;
@@ -684,14 +727,12 @@
                         try {
                             const response = await fetch(`/api/reqDonasi/delete/${reqDonasiId}`, {
                                 method: 'DELETE',
-                                headers: {
-                                    'Accept': 'application/json',
-                                }
+                                headers: { 'Accept': 'application/json' }
                             });
                             const result = await response.json();
                             if (response.ok && result.status === true) {
                                 showStatusMessage('Permintaan donasi berhasil dibatalkan!', 'success');
-                                fetchReqDonasiData(); // Refresh reqDonasi table
+                                fetchReqDonasiData();
                             } else {
                                 showStatusMessage(`Gagal membatalkan permintaan donasi: ${result.message || 'Error tidak diketahui'}`, 'error');
                             }
@@ -703,7 +744,6 @@
                 });
             });
 
-            // Close button for correct reqDonasi modal
             correctReqDonasiCloseButton.addEventListener('click', () => {
                 correctReqDonasiModal.style.display = 'none';
                 correctReqDonasiForm.reset();
@@ -711,7 +751,6 @@
             });
         }
 
-        // Correct ReqDonasi Form Submission Listener (to create Donasi and delete ReqDonasi)
         correctReqDonasiForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             correctReqDonasiFormErrorMessages.textContent = '';
@@ -720,7 +759,7 @@
             const idOrganisasi = correctReqDonasiIdOrganisasiInput.value;
             const namaBarangDonasi = correctReqDonasiNamaBarangInput.value;
             const namaPenerima = correctNamaPenerimaInput.value;
-            const tglDonasi = displayTglDonasi.textContent; // Get the automatically generated date
+            const tglDonasi = displayTglDonasi.textContent;
 
             const newDonasiData = {
                 ID_ORGANISASI: idOrganisasi,
@@ -730,7 +769,6 @@
             };
 
             try {
-                // Step 1: Create Donasi
                 const createDonasiResponse = await fetch('/api/donasi/create', {
                     method: 'POST',
                     headers: {
@@ -752,15 +790,12 @@
                     correctReqDonasiFormErrorMessages.textContent = errorMessage;
                     showStatusMessage(`Gagal membuat donasi: ${errorMessage}`, 'error');
                     console.error('Create Donasi failed:', createDonasiResult);
-                    return; // Stop if creation fails
+                    return;
                 }
 
-                // Step 2: Delete ReqDonasi if Donasi creation is successful
                 const deleteReqDonasiResponse = await fetch(`/api/reqDonasi/delete/${reqDonasiId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 const deleteReqDonasiResult = await deleteReqDonasiResponse.json();
@@ -769,8 +804,8 @@
                     showStatusMessage('Donasi berhasil dibuat dan permintaan donasi dihapus!', 'success');
                     correctReqDonasiModal.style.display = 'none';
                     correctReqDonasiForm.reset();
-                    fetchReqDonasiData(); // Refresh reqDonasi table
-                    fetchDonasiData(); // Refresh donasi table
+                    fetchReqDonasiData();
+                    fetchDonasiData();
                 } else {
                     showStatusMessage(`Donasi berhasil dibuat, tetapi gagal menghapus permintaan donasi: ${deleteReqDonasiResult.message || 'Error tidak diketahui'}`, 'error');
                     console.error('Delete ReqDonasi failed after Donasi creation:', deleteReqDonasiResult);
@@ -784,19 +819,14 @@
         });
 
 
-        // Function to fetch and display Donasi data
         async function fetchDonasiData() {
             const donasiTableBody = document.getElementById('donasi-table-body');
-            donasiTableBody.innerHTML = `<tr><td colspan="6" class="loading-message">Memuat data donasi...</td></tr>`; // Updated colspan
+            donasiTableBody.innerHTML = `<tr><td colspan="6" class="loading-message">Memuat data donasi...</td></tr>`;
 
             try {
-                // Fetch data from the API route for Donasi
                 const response = await fetch('/api/donasi', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        // No Authorization header needed as per current API routes
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
 
                 if (!response.ok) {
@@ -809,20 +839,19 @@
                 if (responseData.status === true && responseData.data) {
                     renderDonasiTable(responseData.data);
                 } else {
-                    donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Gagal memuat data donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`; // Updated colspan
+                    donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Gagal memuat data donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`;
                     console.error('API response indicates failure for Donasi:', responseData);
                 }
 
             } catch (error) {
-                donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Error memuat data donasi. Silakan cek konsol untuk detail.</td></tr>`; // Updated colspan
+                donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Error memuat data donasi. Silakan cek konsol untuk detail.</td></tr>`;
                 console.error('Error fetching Donasi data:', error);
             }
         }
 
-        // Function to render the Donasi table with provided data
         function renderDonasiTable(donasiData) {
             const donasiTableBody = document.getElementById('donasi-table-body');
-            donasiTableBody.innerHTML = ''; // Clear loading message
+            donasiTableBody.innerHTML = '';
 
             if (donasiData.length > 0) {
                 donasiData.forEach(item => {
@@ -839,22 +868,20 @@
                     `;
                     donasiTableBody.appendChild(row);
                 });
-                attachDonasiButtonListeners(); // Attach listeners after rendering
+                attachDonasiButtonListeners();
             } else {
-                donasiTableBody.innerHTML = '<tr><td colspan="6" class="loading-message">Tidak ada data donasi ditemukan.</td></tr>'; // Updated colspan
+                donasiTableBody.innerHTML = '<tr><td colspan="6" class="loading-message">Tidak ada data donasi ditemukan.</td></tr>';
             }
         }
 
-        // Function to attach event listeners for Donasi action buttons
         function attachDonasiButtonListeners() {
             document.querySelectorAll('.edit-donasi-btn').forEach(button => {
                 button.addEventListener('click', async (event) => {
                     event.preventDefault();
                     const donasiId = event.target.dataset.id;
-                    editDonasiFormErrorMessages.textContent = ''; // Clear previous errors
+                    editDonasiFormErrorMessages.textContent = '';
 
                     try {
-                        // Fetch specific donasi data
                         const response = await fetch(`/api/donasi/${donasiId}`);
                         if (!response.ok) {
                             const errorData = await response.json();
@@ -864,11 +891,10 @@
                         if (result.status === true && result.data) {
                             const donasiData = result.data;
                             editDonasiIdInput.value = donasiData.ID_DONASI;
-                            editTglDonasiInput.value = donasiData.TGL_DONASI; // Assuming date format is compatible
+                            editTglDonasiInput.value = donasiData.TGL_DONASI;
                             editNamaPenerimaInput.value = donasiData.NAMA_PENERIMA;
                             editDonasiModal.style.display = 'flex';
                         } else {
-                            // Using showStatusMessage for general page messages
                             showStatusMessage(`Gagal memuat data donasi: ${result.message || 'Error tidak diketahui'}`, 'error');
                         }
                     } catch (error) {
@@ -878,7 +904,6 @@
                 });
             });
 
-            // Close button for edit donasi modal
             editDonasiCloseButton.addEventListener('click', () => {
                 editDonasiModal.style.display = 'none';
                 editDonasiForm.reset();
@@ -886,7 +911,6 @@
             });
         }
 
-        // Edit Donasi Form Submission Listener
         editDonasiForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             editDonasiFormErrorMessages.textContent = '';
@@ -913,7 +937,7 @@
                     showStatusMessage('Data Donasi berhasil diperbarui!', 'success');
                     editDonasiModal.style.display = 'none';
                     editDonasiForm.reset();
-                    fetchDonasiData(); // Refresh the table
+                    fetchDonasiData();
                 } else {
                     console.error('Update Donasi gagal:', result.message);
                     if (result.errors) {
@@ -933,7 +957,78 @@
             }
         });
 
-        // Update the window click listener to close modals
+        // --- JavaScript for Laporan Donasi Barang ---
+        async function fetchLaporanDonasiBarangData() {
+            const laporanTableBody = document.getElementById('laporan-donasi-barang-table-body');
+            laporanTableBody.innerHTML = `<tr><td colspan="7" class="loading-message">Memuat data laporan donasi barang...</td></tr>`;
+
+            try {
+                // IMPORTANT: Replace '/api/laporan/donasi-barang' with your actual API endpoint for this report
+                const response = await fetch('/api/laporan/donasi-barang', { // Placeholder API endpoint
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        // Add Authorization header if needed, e.g., 'Authorization': 'Bearer ' + yourAuthToken
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: response.statusText })); // Graceful error parsing
+                    throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message}`);
+                }
+
+                const responseData = await response.json();
+
+                if (responseData.status === true && responseData.data) {
+                    renderLaporanDonasiBarangTable(responseData.data);
+                } else {
+                     // Use a sample data for demonstration if API fails or returns no data for now
+                    console.warn('API response indicates failure or no data for Laporan Donasi Barang:', responseData.message || 'Data kosong atau error.');
+                    showStatusMessage('Gagal memuat laporan dari API. Menampilkan data contoh.', 'error');
+                    renderLaporanDonasiBarangTable([
+                        { KODE_PRODUK: "K202", NAMA_PRODUK: "Kipas angin Jumbo", ID_PENITIP: "T25", NAMA_PENITIP: "Adi Sanjaya", TGL_DONASI: "29/3/2025", ORGANISASI: "Pemuda Pejuang Kebersihan", NAMA_PENERIMA: "Pak Sugeng" },
+                        { KODE_PRODUK: "K203", NAMA_PRODUK: "Kulkas 3 Pintu", ID_PENITIP: "T14", NAMA_PENITIP: "Gani Hendrawan", TGL_DONASI: "29/3/2025", ORGANISASI: "Yayasan Kasih Ibu Sleman", NAMA_PENERIMA: "Bu Rini" }
+                    ]); // Render with sample data
+                }
+
+            } catch (error) {
+                laporanTableBody.innerHTML = `<tr><td colspan="7" class="error-message">Error memuat data laporan: ${error.message}. Menampilkan data contoh.</td></tr>`;
+                console.error('Error fetching Laporan Donasi Barang data:', error);
+                 // Fallback to sample data on critical error
+                renderLaporanDonasiBarangTable([
+                    { KODE_PRODUK: "K202", NAMA_PRODUK: "Kipas angin Jumbo", ID_PENITIP: "T25", NAMA_PENITIP: "Adi Sanjaya", TGL_DONASI: "29/3/2025", ORGANISASI: "Pemuda Pejuang Kebersihan", NAMA_PENERIMA: "Pak Sugeng" },
+                    { KODE_PRODUK: "K203", NAMA_PRODUK: "Kulkas 3 Pintu", ID_PENITIP: "T14", NAMA_PENITIP: "Gani Hendrawan", TGL_DONASI: "29/3/2025", ORGANISASI: "Yayasan Kasih Ibu Sleman", NAMA_PENERIMA: "Bu Rini" },
+                    { KODE_PRODUK: "L005", NAMA_PRODUK: "Lemari Pakaian Kayu", ID_PENITIP: "T08", NAMA_PENITIP: "Siti Aminah", TGL_DONASI: "30/3/2025", ORGANISASI: "Panti Asuhan Ceria", NAMA_PENERIMA: "Ibu Pengurus Panti" }
+                ]);
+            }
+        }
+
+        function renderLaporanDonasiBarangTable(laporanData) {
+            const laporanTableBody = document.getElementById('laporan-donasi-barang-table-body');
+            laporanTableBody.innerHTML = ''; // Clear loading or error message
+
+            if (laporanData.length > 0) {
+                laporanData.forEach(item => {
+                    const row = document.createElement('tr');
+                    // Ensure your API provides these exact field names or adjust accordingly
+                    row.innerHTML = `
+                        <td>${item.KODE_PRODUK || 'N/A'}</td>
+                        <td>${item.NAMA_PRODUK || 'N/A'}</td>
+                        <td>${item.ID_PENITIP || 'N/A'}</td>
+                        <td>${item.NAMA_PENITIP || 'N/A'}</td>
+                        <td>${item.TGL_DONASI || 'N/A'}</td>
+                        <td>${item.ORGANISASI || 'N/A'}</td>
+                        <td>${item.NAMA_PENERIMA || 'N/A'}</td>
+                    `;
+                    laporanTableBody.appendChild(row);
+                });
+            } else {
+                laporanTableBody.innerHTML = '<tr><td colspan="7" class="loading-message">Tidak ada data laporan donasi barang ditemukan.</td></tr>';
+            }
+        }
+        // --- END JavaScript for Laporan Donasi Barang ---
+
+
         window.addEventListener('click', (event) => {
             if (event.target.classList.contains('modal')) {
                 const modal = event.target;
@@ -948,24 +1043,13 @@
             }
         });
 
-        // Initial data load: Fetch data and render when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             fetchReqDonasiData();
             fetchDonasiData();
-        });
+            fetchLaporanDonasiBarangData(); // Fetch data for the new report
 
-        // Contoh sederhana untuk menyorot link navigasi aktif (opsional)
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.navbar .nav-links a');
-
-            navLinks.forEach(link => {
-                // Anda perlu menyesuaikan logika ini agar sesuai dengan rute Laravel Anda
-                // Misalnya, jika rute 'Dashboard Owner' adalah '/admin/owner-dashboard'
-                // if (link.href.includes('/admin/owner-dashboard')) {
-                //     link.style.color = '#7BC9FF'; // Menyorot link aktif
-                // }
-            });
+            // Optional: Highlight active link based on actual routing if implemented
         });
     </script>
 

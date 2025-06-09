@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\RegistrationHandlerController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -45,6 +44,10 @@ Route::get('/detailBarang/{id}', function ($id) {
     return view('detailBarangPage', ['id' => $id]);
 })->name('detailBarang');
 
+Route::match(['GET', 'POST', 'PUT'], '/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
+
 Route::get('/historyPage', function () {
     return view('history.historyPage');
 })->name('historyPage');
@@ -53,9 +56,13 @@ Route::get('/ratingPage', function () {
     return view('ratingPage');
 })->name('ratingPage');
 
+Route::get('/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
 
-
-
+Route::get('/cartPembeli', function () {
+    return view('cart');
+})->name('cartPembeli');
 
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
