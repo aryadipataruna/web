@@ -459,6 +459,7 @@
 
             switch (selectedRole) {
                 case 'pembeli':
+                    // These are Laravel Blade directives, they need to be rendered by a Laravel backend
                     registrationRoute = '{{ route("pembeli.store") }}';
                     nameMapping = {
                         name: 'NAMA_PEMBELI',
@@ -472,6 +473,7 @@
                     requiredFields = ['name', 'email', 'password', 'password_confirmation', 'phone', 'address', 'poin'];
                     break;
                 case 'organisasi':
+                    // These are Laravel Blade directives, they need to be rendered by a Laravel backend
                     registrationRoute = '{{ route("organisasi.store") }}';
                     nameMapping = {
                         name: 'NAMA_ORGANISASI',
@@ -599,7 +601,7 @@
                     } else if (result.data.role === 'gudang') {
                         window.location.href = '/adminPageGudang';
                     } else if (result.data.role === 'customer service') {
-                        window.location.href = '/csDashboard';
+                        window.location.href = '/adminPageCS';
                     } else if (result.data.role === 'hunter') {
                         window.location.href = '/hunterDashboard';
                     } else if (result.data.role === 'kurir') {
@@ -623,6 +625,17 @@
 
             // Clear previous error messages
             signUpErrorMessage.textContent = '';
+        // Event listeners for mode toggling
+        elements.signUpBtn.addEventListener("click", switchToSignUp);
+        elements.signInBtn.addEventListener("click", switchToSignIn);
+        elements.signUpBtn2.addEventListener("click", switchToSignUpMobile);
+        elements.signInBtn2.addEventListener("click", switchToSignIn);
+
+        // API call utility
+        async function submitForm(form, errorElement, button, successCallback) {
+            button.disabled = true;
+            button.classList.add('btn-loading');
+            errorElement.textContent = '';
 
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
@@ -631,7 +644,9 @@
                 if (!key.startsWith('generic_') && key !== 'role') {
                     finalData[key] = data[key];
                 }
+                return;
             }
+
 
             try {
                 const response = await fetch(form.action, {
@@ -641,7 +656,7 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
                     },
-                    body: JSON.stringify(finalData)
+                    body: JSON.stringify(data) // Send the processed data
                 });
 
                 const result = await response.json();

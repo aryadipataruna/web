@@ -385,14 +385,14 @@
                 <a href="/api/laporan-penjualan-bulanan/2025">Laporan Penjualan Bulanan</a>
             </div>
             <div class="dashboard-card">
-                <h3>Manajemen Organisasi</h3>
-                <p>Kelola data organisasi mitra dan donasi.</p>
-                <a href="#">Lihat Organisasi</a>
+                <h3>Komisi Bulanan per Produk</h3>
+                <p>Laporan Komisi Bulanan per Produk PDF.</p>
+                <a href="/api/laporan-komisi">Laporan Komisi</a>
             </div>
             <div class="dashboard-card">
-                <h3>Manajemen Merchandise</h3>
-                <p>Kelola inventaris merchandise dan penukaran.</p>
-                <a href="#">Lihat Merchandise</a>
+                <h3>Laporan Stok Gudang</h3>
+                <p>Laporan Stok Barang di Gudang PDF.</p>
+                <a href="/api/laporan-stok-gudang">Laporan Stok</a>
             </div>
             <div class="dashboard-card">
                 <h3>Manajemen Pembeli</h3>

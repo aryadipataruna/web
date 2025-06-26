@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barang; // Import the Barang model
 use Carbon\Carbon; // For date manipulation
+use Spatie\Browsershot\Browsershot; // Import Browsershot
 
 class LaporanKomisiController extends Controller
 {
@@ -18,16 +19,11 @@ class LaporanKomisiController extends Controller
         $tahun = $currentYear;
         $tanggalCetak = Carbon::now()->format('d F Y');
 
-        // Assuming sales happened within this month, or we need to filter by tgl_laku
-        // For simplicity, let's fetch items that were consigned or sold in January 2025
-        // You might need more refined logic based on how "monthly report" is defined (e.g., items sold in that month)
-
-        // For the example, we have specific items. Let's fetch them
-        // Adjust this query to dynamically filter based on actual sales data for the month
+        // Fetch items that were sold in the current month and year
         $items = Barang::whereNotNull('tgl_laku') // Ensure the item has been sold
-                       ->whereMonth('tgl_laku', $currentMonth)
-                       ->whereYear('tgl_laku', $currentYear)
-                       ->get();
+                        ->whereMonth('tgl_laku', $currentMonth)
+                        ->whereYear('tgl_laku', $currentYear)
+                        ->get();
 
         // Calculate totals
         $totalHargaJual = 0;
@@ -42,7 +38,9 @@ class LaporanKomisiController extends Controller
             $totalBonusPenitip += $item->bonus_penitip;
         }
 
-        return view('laporan.laporanKomisi', compact(
+        // --- Render the Blade view to HTML first ---
+        // This is crucial: we get the HTML content as a string
+        $html = view('laporan.laporanKomisi', compact(
             'bulan',
             'tahun',
             'tanggalCetak',
@@ -51,6 +49,28 @@ class LaporanKomisiController extends Controller
             'totalKomisiHunter',
             'totalKomisiReuseMart',
             'totalBonusPenitip'
-        ));
+        ))->render(); // Use ->render() to get the HTML content
+
+        // Define filename and path for the PDF
+        $fileName = 'Laporan_Komisi_' . $bulan . '_' . $tahun . '_' . Carbon::now()->format('Ymd_His') . '.pdf';
+        $pdfPath = storage_path('app/public/' . $fileName); // Adjust the path as needed
+
+        // Generate PDF using Browsershot
+        try {
+            Browsershot::html($html)
+                ->noSandbox() // Required for environments without a dedicated sandbox
+                ->showBackground() // Ensures background colors/images are included
+                ->format('A4') // Set paper format
+                ->save($pdfPath); // Save the PDF to the specified path
+
+            // Return PDF as a download response and delete the file after sending
+            return response()->download($pdfPath, $fileName)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            // Log the error for debugging purposes
+            \Log::error('PDF generation failed: ' . $e->getMessage());
+            // Return a JSON response with an error message
+            return response()->json(['status' => false, 'message' => 'Gagal membuat PDF: ' . $e->getMessage()], 500);
+        }
     }
 }
