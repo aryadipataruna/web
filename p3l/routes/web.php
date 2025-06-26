@@ -64,6 +64,11 @@ Route::get('/cartPembeli', function () {
     return view('cart');
 })->name('cartPembeli');
 
+Route::get('/admin/laporan/donasi-barang', [LaporanController::class, 'tampilkanDonasiBarang'])->name('admin.laporan.donasiBarang');
+
+// ROUTE BARU untuk men-download PDF-nya
+Route::get('/admin/laporan/donasi-barang/download', [LaporanController::class, 'downloadPDF'])->name('admin.laporan.donasiBarang.download');
+
 // Route::get('/passwordBiasa'), fuction (){
 //     return view('password.passwordTglLahir');
 // })->name('passwordEmail');
