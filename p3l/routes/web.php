@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('homePage');
 });
 
 Route::get('/home', function () {
@@ -60,9 +60,9 @@ Route::get('/cartPembeli', function () {
     return view('cart');
 })->name('cartPembeli');
 
-Route::get('/cartPembeli', function () {
-    return view('cart');
-})->name('cartPembeli');
+Route::get('/validasiCs', function () {
+    return view('validasiCs');
+})->name('validasiPage');
 
 Route::get('/admin/laporan/donasi-barang', [LaporanController::class, 'tampilkanDonasiBarang'])->name('admin.laporan.donasiBarang');
 

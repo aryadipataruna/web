@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Owner</title>
+    <title>Admin Dashboard - Laporan Donasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Basic reset and font */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif; /* Use Poppins font */
+        :root {
+            --primary-color: #8576FF;
+            --secondary-color: #7BC9FF;
+            --dark-color: #1a1a1a;
+            --light-color: #f0f0f0;
+            --text-color: #333;
+            --border-color: #ddd;
         }
 
-        body {
-            background-color: #f0f0f0; /* Light grey background */
-            color: #333; /* Default text color */
-            line-height: 1.6;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--light-color); color: var(--text-color); line-height: 1.6; }
 
         .navbar {
-            background-color: #1a1a1a; /* Dark background for navbar */
+            background-color: var(--dark-color);
             color: #fff;
             padding: 10px 20px;
             display: flex;
@@ -30,338 +28,65 @@
             align-items: center;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+        .navbar .nav-links { display: flex; gap: 20px; }
+        .navbar .nav-links a { color: #fff; text-decoration: none; font-weight: 600; transition: color 0.3s ease; }
+        .navbar .nav-links a:hover, .navbar .nav-links a.active { color: var(--secondary-color); }
+        .navbar .user-info { display: flex; align-items: center; gap: 10px; }
+        .navbar .user-info .user-avatar { width: 30px; height: 30px; background-color: var(--secondary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--dark-color); font-weight: 700; }
+        .navbar .user-info .user-details { display: flex; flex-direction: column; font-size: 0.9rem; }
+        .navbar .user-info .user-details .role { font-size: 0.8rem; color: #ccc; }
 
-        .navbar .nav-links {
-            display: flex;
-            gap: 20px;
-        }
+        .container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+        .page-title { font-size: 2rem; color: var(--text-color); margin-bottom: 20px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
 
-        .navbar .nav-links a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+        .data-section { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
+        .data-section h2 { font-size: 1.8rem; color: var(--text-color); margin-bottom: 15px; }
 
-        .navbar .nav-links a:hover {
-            color: #7BC9FF; /* Highlight color on hover */
-        }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .toolbar .search-bar { width: 100%; max-width: 300px; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 5px; font-size: 0.9rem; }
 
-        .navbar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: background-color 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: #6b60c4; }
+        .btn-edit { background-color: #3498db; color: white; padding: 5px 10px; font-size: 0.8rem; }
+        .btn-delete { background-color: #e74c3c; color: white; padding: 5px 10px; font-size: 0.8rem; }
 
-        .navbar .user-info .user-avatar {
-            width: 30px;
-            height: 30px;
-            background-color: #7BC9FF; /* Avatar background color */
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1a1a1a;
-            font-weight: 700;
-        }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.95rem; }
+        .data-table th, .data-table td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        .data-table th { background-color: #f2f2f2; font-weight: 700; }
+        .data-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        .data-table .action-cell { display: flex; gap: 8px; }
 
-        .navbar .user-info .user-details {
-            display: flex;
-            flex-direction: column;
-            font-size: 0.9rem;
-        }
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fefefe; margin: auto; padding: 25px; border: 1px solid #888; width: 90%; max-width: 500px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
+        .modal-title { font-size: 1.5rem; color: var(--text-color); }
+        .close-button { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .close-button:hover { color: #000; }
 
-        .navbar .user-info .user-details .role {
-            font-size: 0.8rem;
-            color: #ccc;
-        }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 1rem; }
+        .modal-footer { text-align: right; margin-top: 20px; }
 
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        .page-title {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #8576FF; /* Underline title */
-            padding-bottom: 10px;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-            margin-bottom: 40px; /* Add margin below grid */
-        }
-
-        .dashboard-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .dashboard-card h3 {
-            color: #8576FF;
-            margin-bottom: 10px;
-        }
-
-        .dashboard-card p {
-            font-size: 1.1rem;
-            color: #555;
-        }
-
-        .dashboard-card a {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 8px 15px;
-            background-color: #7BC9FF;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .dashboard-card a:hover {
-            background-color: #5aaee0;
-        }
-
-        /* Styles for data tables */
-        .data-section {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .data-section h2 {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        .data-table th,
-        .data-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .data-table th {
-            background-color: #f2f2f2;
-            font-weight: 700;
-        }
-
-        .data-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        .loading-message, .error-message {
-            text-align: center;
-            padding: 20px;
-            font-size: 1.1rem;
-            color: #666;
-        }
-
-        .error-message {
-            color: red;
-        }
-
-        /* --- Modal Styles (Shared) --- */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 10; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            align-items: center; /* Center modal content vertically */
-            justify-content: center; /* Center modal content horizontally */
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: auto; /* Center horizontally and vertically */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Adjust width as needed */
-            max-width: 600px; /* Maximum width */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            position: relative; /* Needed for close button positioning */
-        }
-
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .modal-content h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            color: #333;
-            border-bottom: 2px solid #8576FF;
-            padding-bottom: 10px;
-        }
-
-        .modal-content label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-
-        .modal-content input[type="text"],
-        .modal-content input[type="email"],
-        .modal-content input[type="password"],
-        .modal-content input[type="date"], /* Added date input type */
-        .modal-content select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .modal-content button[type="submit"] {
-            background-color: #8576FF;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        .modal-content button[type="submit"]:hover {
-            background-color: #6b60c4;
-        }
-
-        /* Error message styles (Shared) */
-        .form-error-messages {
-             color: red;
-             font-size: 0.9rem;
-             margin-bottom: 15px;
-        }
-
-        .action-buttons-group {
-            display: flex;
-            gap: 8px; /* Space between buttons */
-            justify-content: center; /* Center buttons in the cell */
-        }
-
-        .action-buttons-group .btn-action {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease;
-        }
-
-        .action-buttons-group .btn-correct {
-            background-color: #28a745; /* Green for correct */
-            color: white;
-        }
-
-        .action-buttons-group .btn-correct:hover {
-            background-color: #218838;
-        }
-
-        .action-buttons-group .btn-cancel {
-            background-color: #dc3545; /* Red for cancel */
-            color: white;
-        }
-
-        .action-buttons-group .btn-cancel:hover {
-            background-color: #c82333;
-        }
-
-
-        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .navbar .nav-links {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 8px;
-                font-size: 0.9rem;
-            }
-
-            .modal-content {
-                width: 95%; /* Make modal wider on smaller screens */
-            }
+            .navbar { flex-direction: column; gap: 15px; padding: 15px; }
+            .page-title { font-size: 1.5rem; }
+            .data-table { font-size: 0.85rem; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar .search-bar { max-width: none; }
         }
-
-        @media (max-width: 480px) {
-            .page-title {
-                font-size: 1.2rem;
-            }
-            .data-table th,
-            .data-table td {
-                font-size: 0.8rem;
-            }
-        }
-
     </style>
 </head>
 <body>
 
     <div class="navbar">
         <div class="nav-links">
-            <a href="#">Dashboard Owner</a> {{-- Highlight Owner Dashboard link --}}
+            <a href="#">Dashboard</a>
             <a href="#">Pegawai</a>
             <a href="#">Organisasi</a>
-            <a href="#">Merchandise</a>
-            <a href="#">Pembeli</a>
-            <a href="#">Penitip</a>
-            <a href="#">Laporan</a>
+            <a href="#" class="active">Laporan</a>
             <a href="#">Profile</a>
         </div>
         <div class="user-info">
@@ -369,9 +94,7 @@
                 <span>GreenTea123</span>
                 <span class="role">Owner</span>
             </div>
-            <div class="user-avatar">
-                 <i class="fas fa-user-tie"></i> {{-- Owner icon --}}
-            </div>
+            <div class="user-avatar"><i class="fas fa-user-tie"></i></div>
         </div>
     </div>
 
@@ -414,560 +137,358 @@
                 <p>Konfigurasi parameter sistem dan akses pengguna.</p>
                 <a href="#">Pengaturan</a>
             </div>
-        </div>
-
-        {{-- Section for ReqDonasi Data --}}
-        <div class="data-section">
-            <h2>Data Permintaan Donasi</h2>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Action</th> {{-- New Action column for ReqDonasi --}}
-                        <th>ID Permintaan</th>
-                        <th>ID Organisasi</th>
-                        <th>Nama Barang</th>
-                        <th>Tanggal Permintaan</th>
+                        <th>Kode Produk</th>
+                        <th>Nama Produk</th>
+                        <th>Nama Penitip</th>
+                        <th>Organisasi</th>
+                        <th>Penerima</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="reqdonasi-table-body">
-                    <tr>
-                        <td colspan="5" class="loading-message">Memuat data permintaan donasi...</td> {{-- Updated colspan --}}
-                    </tr>
-                </tbody>
+                <tbody id="laporan-donasi-table-body"></tbody>
             </table>
         </div>
 
-        {{-- Section for Donasi Data --}}
+        <!-- Section for Laporan Request Donasi -->
         <div class="data-section">
-            <h2>Data Donasi</h2>
+            <h2>Laporan Request Donasi (Belum Terpenuhi)</h2>
+            <div class="toolbar">
+                <input type="search" id="search-request" class="search-bar" placeholder="Cari request donasi...">
+                 <div>
+                    <button id="add-request-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Request</button>
+                    <button id="print-request-btn" class="btn btn-primary"><i class="fas fa-print"></i> Cetak PDF</button>
+                </div>
+            </div>
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Action</th> {{-- New Action column --}}
-                        <th>ID Donasi</th>
                         <th>ID Organisasi</th>
-                        <th>Nama Barang Donasi</th>
-                        <th>Tanggal Donasi</th>
-                        <th>Nama Penerima</th>
+                        <th>Nama</th>
+                        <th>Alamat</th>
+                        <th>Request</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="donasi-table-body">
-                    <tr>
-                        <td colspan="6" class="loading-message">Memuat data donasi...</td> {{-- Updated colspan --}}
-                    </tr>
-                </tbody>
+                <tbody id="laporan-request-table-body"></tbody>
             </table>
         </div>
-
-        <p style="text-align: center; margin-top: 40px; color: #666;">
-            Ini adalah dasbor utama untuk Owner. Konten lebih lanjut akan ditambahkan di sini.
-        </p>
     </div>
 
-    <div id="editDonasiModal" class="modal">
+    <!-- Universal Modal for CRUD -->
+    <div id="crud-modal" class="modal">
         <div class="modal-content">
-            <span class="close-button edit-donasi-close-button">&times;</span>
-            <h2>Edit Data Donasi</h2>
-            <div id="editDonasiFormErrorMessages" class="form-error-messages"></div>
-            <form id="editDonasiForm">
-                <input type="hidden" id="editDonasiId" name="ID_DONASI">
-
-                <label for="editTglDonasi">Tanggal Donasi:</label>
-                <input type="date" id="editTglDonasi" name="TGL_DONASI" required>
-
-                <label for="editNamaPenerima">Nama Penerima:</label>
-                <input type="text" id="editNamaPenerima" name="NAMA_PENERIMA" required>
-
-                <button type="submit">Update Donasi</button>
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <span class="close-button">&times;</span>
+            </div>
+            <form id="crud-form">
+                <!-- Form content will be dynamically inserted here -->
             </form>
         </div>
     </div>
 
-    <div id="correctReqDonasiModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button correct-reqdonasi-close-button">&times;</span>
-            <h2>Konfirmasi Donasi</h2>
-            <div id="correctReqDonasiFormErrorMessages" class="form-error-messages"></div>
-            <form id="correctReqDonasiForm" method="POST" action="{{ url('/donasi/konfirmasi-dan-cetak') }}">
-                @csrf <input type="hidden" id="correctReqDonasiId" name="ID_REQDONASI">
-                    <input type="hidden" id="correctReqDonasiIdOrganisasi" name="ID_ORGANISASI">
-                    <input type="hidden" id="correctReqDonasiNamaBarang" name="NAMA_BARANG_DONASI">
-
-                    <input type="hidden" id="hiddenTglDonasi" name="TGL_DONASI">
-
-                    <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
-                    <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
-                    <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
-                    <p><strong>Nama Barang:</strong> <span id="displayReqDonasiNamaBarang"></span></p>
-                    <p><strong>Tanggal Donasi:</strong> <span id="displayTglDonasi"></span> (Otomatis hari ini)</p>
-
-                    <label for="correctNamaPenerima">Nama Penerima Donasi:</label>
-                    <input type="text" id="correctNamaPenerima" name="NAMA_PENERIMA" required>
-
-                    <button type="submit">Konfirmasi & Buat Donasi</button>
-                </form>
-                <p>Anda akan mengkonfirmasi permintaan donasi ini menjadi donasi yang diterima.</p>
-                <p><strong>ID Permintaan:</strong> <span id="displayReqDonasiId"></span></p>
-                <p><strong>Organisasi:</strong> <span id="displayReqDonasiOrganisasi"></span></p>
-                <p><strong>Nama Barang:</strong> <span id="displayReqDonasiNamaBarang"></span></p>
-                <p><strong>Tanggal Donasi:</strong> <span id="displayTglDonasi"></span> (Otomatis hari ini)</p>
-
-                <label for="correctNamaPenerima">Nama Penerima Donasi:</label>
-                <input type="text" id="correctNamaPenerima" name="NAMA_PENERIMA" required>
-
-                <button type="submit">Konfirmasi & Buat Donasi</button>
-            </form>
-        </div>
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <script>
-        // JavaScript untuk halaman Owner akan ditempatkan di sini.
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA ---
+            let laporanDonasiData = [
+                { kodeProduk: 'K202', namaProduk: 'Kipas angin Jumbo', idPenitip: 'T25', namaPenitip: 'Adi Sanjaya', tanggalDonasi: '29/3/2025', organisasi: 'Pemuda Pejuang Kebersihan', namaPenerima: 'Pak Sugeng' },
+                { kodeProduk: 'K203', namaProduk: 'Kulkas 3 Pintu', idPenitip: 'T14', namaPenitip: 'Gani Hendrawan', tanggalDonasi: '29/3/2025', organisasi: 'Yayasan Kasih Ibu Sleman', namaPenerima: 'Bu Rini' },
+                { kodeProduk: 'B101', namaProduk: 'Set Pakaian Anak', idPenitip: 'T31', namaPenitip: 'Rina Pertiwi', tanggalDonasi: '05/4/2025', organisasi: 'Panti Asuhan Pelita Harapan', namaPenerima: 'Ibu Susi' },
+            ];
+            let laporanRequestData = [
+                { idOrganisasi: 'ORG10', nama: 'Yayasan Kasih Ibu Sleman', alamat: 'Jl. Kebangsaan 12 Maguwo', request: 'Kulkas (untuk menyimpan makanan bayi dan anak-anak)' },
+                { idOrganisasi: 'ORG15', nama: 'Pemuda Pejuang Kebersihan', alamat: 'Jl. Garuda CTX/13 Tambak Bayan', request: 'Kipas angin, alat kebersihan seperti vacum cleaner dan blower' },
+                { idOrganisasi: 'ORG18', nama: 'Panti Asuhan Pelita Harapan', alamat: 'Jl. Cendrawasih No. 22', request: 'Lemari pakaian 2 pintu dan buku-buku cerita anak' },
+            ];
 
-        // Get references to Donasi edit modal elements
-        const editDonasiModal = document.getElementById('editDonasiModal');
-        const editDonasiCloseButton = editDonasiModal.querySelector('.close-button');
-        const editDonasiForm = document.getElementById('editDonasiForm');
-        const editDonasiFormErrorMessages = document.getElementById('editDonasiFormErrorMessages');
-        const editDonasiIdInput = document.getElementById('editDonasiId');
-        const editTglDonasiInput = document.getElementById('editTglDonasi');
-        const editNamaPenerimaInput = document.getElementById('editNamaPenerima');
+            // --- DOM ELEMENTS ---
+            const modal = document.getElementById('crud-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const crudForm = document.getElementById('crud-form');
+            const closeModalBtn = modal.querySelector('.close-button');
 
-        // Get references to Correct ReqDonasi modal elements
-        const correctReqDonasiModal = document.getElementById('correctReqDonasiModal');
-        const correctReqDonasiCloseButton = correctReqDonasiModal.querySelector('.close-button');
-        const correctReqDonasiForm = document.getElementById('correctReqDonasiForm');
-        const correctReqDonasiFormErrorMessages = document.getElementById('correctReqDonasiFormErrorMessages');
-        const correctReqDonasiIdInput = document.getElementById('correctReqDonasiId');
-        const correctReqDonasiIdOrganisasiInput = document.getElementById('correctReqDonasiIdOrganisasi');
-        const correctReqDonasiNamaBarangInput = document.getElementById('correctReqDonasiNamaBarang');
-        const correctNamaPenerimaInput = document.getElementById('correctNamaPenerima');
-        const displayReqDonasiId = document.getElementById('displayReqDonasiId');
-        const displayReqDonasiOrganisasi = document.getElementById('displayReqDonasiOrganisasi');
-        const displayReqDonasiNamaBarang = document.getElementById('displayReqDonasiNamaBarang');
-        const displayTglDonasi = document.getElementById('displayTglDonasi');
-
-
-        // Function to display status messages
-        function showStatusMessage(message, type) {
-            const statusMessageDiv = document.createElement('div'); // Create a new div for the message
-            statusMessageDiv.textContent = message;
-            statusMessageDiv.className = 'status'; // Reset classes
-            statusMessageDiv.classList.add(type); // Add 'success' or 'error' class
-            statusMessageDiv.style.display = 'block'; // Make it visible
-            statusMessageDiv.style.marginTop = '20px'; // Add some margin
-            statusMessageDiv.style.padding = '10px';
-            statusMessageDiv.style.borderRadius = '4px';
-            statusMessageDiv.style.textAlign = 'center';
-
-            if (type === 'success') {
-                statusMessageDiv.style.backgroundColor = '#d4edda';
-                statusMessageDiv.style.color = '#155724';
-                statusMessageDiv.style.border = '1px solid #c3e6cb';
-            } else if (type === 'error') {
-                statusMessageDiv.style.backgroundColor = '#f8d7da';
-                statusMessageDiv.style.color = '#721c24';
-                statusMessageDiv.style.border = '1px solid #f5c6cb';
-            }
-
-            // Append the message to the container, or a specific status area if you have one
-            // For this example, I'll append it to the main container
-            document.querySelector('.container').appendChild(statusMessageDiv);
-
-            // Hide the message after a few seconds
-            setTimeout(() => {
-                statusMessageDiv.remove(); // Remove the element
-            }, 5000); // Hide after 5 seconds
-        }
-
-
-        // Function to fetch and display ReqDonasi data
-        async function fetchReqDonasiData() {
-            const reqDonasiTableBody = document.getElementById('reqdonasi-table-body');
-            reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="loading-message">Memuat data permintaan donasi...</td></tr>`; // Updated colspan
-
-            try {
-                // Fetch data from the API route for ReqDonasi
-                const response = await fetch('/api/reqDonasi', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        // No Authorization header needed as per current API routes
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
+            // --- RENDER FUNCTIONS ---
+            function renderDonasiTable(data) {
+                const tableBody = document.getElementById('laporan-donasi-table-body');
+                tableBody.innerHTML = '';
+                if(data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Data tidak ditemukan.</td></tr>`;
+                    return;
                 }
-
-                const responseData = await response.json();
-
-                if (responseData.status === true && responseData.data) {
-                    renderReqDonasiTable(responseData.data);
-                } else {
-                    reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Gagal memuat data permintaan donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`; // Updated colspan
-                    console.error('API response indicates failure for ReqDonasi:', responseData);
-                }
-
-            } catch (error) {
-                reqDonasiTableBody.innerHTML = `<tr><td colspan="5" class="error-message">Error memuat data permintaan donasi. Silakan cek konsol untuk detail.</td></tr>`; // Updated colspan
-                console.error('Error fetching ReqDonasi data:', error);
-            }
-        }
-
-        // Function to render the ReqDonasi table with provided data
-        function renderReqDonasiTable(reqDonasiData) {
-            const reqDonasiTableBody = document.getElementById('reqdonasi-table-body');
-            reqDonasiTableBody.innerHTML = ''; // Clear loading message
-
-            if (reqDonasiData.length > 0) {
-                reqDonasiData.forEach(item => {
+                data.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>
-                            <div class="action-buttons-group">
-                                <button class="btn-action btn-correct"
-                                    data-id="${item.ID_REQDONASI}"
-                                    data-id-organisasi="${item.ID_ORGANISASI}"
-                                    data-nama-barang="${item.NAMA_BARANG_REQDONASI}">Correct</button>
-                                <button class="btn-action btn-cancel" data-id="${item.ID_REQDONASI}">Cancel</button>
-                            </div>
+                        <td>${item.kodeProduk}</td>
+                        <td>${item.namaProduk}</td>
+                        <td>${item.namaPenitip}</td>
+                        <td>${item.organisasi}</td>
+                        <td>${item.namaPenerima}</td>
+                        <td class="action-cell">
+                            <button class="btn btn-edit" data-id="${item.kodeProduk}" data-type="donasi"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-delete" data-id="${item.kodeProduk}" data-type="donasi"><i class="fas fa-trash"></i></button>
                         </td>
-                        <td>${item.ID_REQDONASI}</td>
-                        <td>${item.ID_ORGANISASI}</td>
-                        <td>${item.NAMA_BARANG_REQDONASI}</td>
-                        <td>${item.TGL_REQ}</td>
                     `;
-                    reqDonasiTableBody.appendChild(row);
+                    tableBody.appendChild(row);
                 });
-                attachReqDonasiButtonListeners(); // Attach listeners after rendering
-            } else {
-                reqDonasiTableBody.innerHTML = '<tr><td colspan="5" class="loading-message">Tidak ada data permintaan donasi ditemukan.</td></tr>'; // Updated colspan
             }
-        }
 
-        // Function to attach event listeners for ReqDonasi action buttons
-        function attachReqDonasiButtonListeners() {
-            // Correct button listener
-            document.querySelectorAll('.btn-correct').forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const reqDonasiId = event.target.dataset.id;
-                    const idOrganisasi = event.target.dataset.idOrganisasi;
-                    const namaBarang = event.target.dataset.namaBarang;
-
-                    // Populate hidden fields and display info in the modal
-                    correctReqDonasiIdInput.value = reqDonasiId;
-                    correctReqDonasiIdOrganisasiInput.value = idOrganisasi;
-                    correctReqDonasiNamaBarangInput.value = namaBarang;
-
-                    displayReqDonasiId.textContent = reqDonasiId;
-                    displayReqDonasiOrganisasi.textContent = idOrganisasi;
-                    displayReqDonasiNamaBarang.textContent = namaBarang;
-
-                    const today = new Date();
-                    const formattedDate = today.getFullYear() + '-' +
-                                          String(today.getMonth() + 1).padStart(2, '0') + '-' +
-                                          String(today.getDate()).padStart(2, '0');
-                    displayTglDonasi.textContent = formattedDate;
-
-                    correctReqDonasiFormErrorMessages.textContent = ''; // Clear previous errors
-                    correctNamaPenerimaInput.value = ''; // Clear previous input
-                    correctReqDonasiModal.style.display = 'flex';
-                });
-            });
-
-            // Cancel button listener
-            document.querySelectorAll('.btn-cancel').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    const reqDonasiId = event.target.dataset.id;
-                    if (confirm(`Apakah Anda yakin ingin membatalkan permintaan donasi ID: ${reqDonasiId}?`)) {
-                        try {
-                            const response = await fetch(`/api/reqDonasi/delete/${reqDonasiId}`, {
-                                method: 'DELETE',
-                                headers: {
-                                    'Accept': 'application/json',
-                                }
-                            });
-                            const result = await response.json();
-                            if (response.ok && result.status === true) {
-                                showStatusMessage('Permintaan donasi berhasil dibatalkan!', 'success');
-                                fetchReqDonasiData(); // Refresh reqDonasi table
-                            } else {
-                                showStatusMessage(`Gagal membatalkan permintaan donasi: ${result.message || 'Error tidak diketahui'}`, 'error');
-                            }
-                        } catch (error) {
-                            showStatusMessage(`Error membatalkan permintaan donasi: ${error.message}`, 'error');
-                            console.error('Error during cancel reqDonasi:', error);
-                        }
-                    }
-                });
-            });
-
-            // Close button for correct reqDonasi modal
-            correctReqDonasiCloseButton.addEventListener('click', () => {
-                correctReqDonasiModal.style.display = 'none';
-                correctReqDonasiForm.reset();
-                correctReqDonasiFormErrorMessages.textContent = '';
-            });
-        }
-
-        // Correct ReqDonasi Form Submission Listener (to create Donasi and delete ReqDonasi)
-        correctReqDonasiForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            correctReqDonasiFormErrorMessages.textContent = '';
-
-            const reqDonasiId = correctReqDonasiIdInput.value;
-            const idOrganisasi = correctReqDonasiIdOrganisasiInput.value;
-            const namaBarangDonasi = correctReqDonasiNamaBarangInput.value;
-            const namaPenerima = correctNamaPenerimaInput.value;
-            const tglDonasi = displayTglDonasi.textContent; // Get the automatically generated date
-
-            const newDonasiData = {
-                ID_ORGANISASI: idOrganisasi,
-                NAMA_BARANG_DONASI: namaBarangDonasi,
-                TGL_DONASI: tglDonasi,
-                NAMA_PENERIMA: namaPenerima,
-            };
-
-            try {
-                // Step 1: Create Donasi
-                const createDonasiResponse = await fetch('/api/donasi/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify(newDonasiData)
-                });
-
-                const createDonasiResult = await createDonasiResponse.json();
-
-                if (!createDonasiResponse.ok || createDonasiResult.status !== true) {
-                    let errorMessage = createDonasiResult.message || 'Gagal membuat donasi.';
-                    if (createDonasiResult.errors) {
-                        for (const field in createDonasiResult.errors) {
-                            errorMessage += `\n- ${field}: ${createDonasiResult.errors[field].join(', ')}`;
-                        }
-                    }
-                    correctReqDonasiFormErrorMessages.textContent = errorMessage;
-                    showStatusMessage(`Gagal membuat donasi: ${errorMessage}`, 'error');
-                    console.error('Create Donasi failed:', createDonasiResult);
-                    return; // Stop if creation fails
+            function renderRequestTable(data) {
+                const tableBody = document.getElementById('laporan-request-table-body');
+                tableBody.innerHTML = '';
+                 if(data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px;">Data tidak ditemukan.</td></tr>`;
+                    return;
                 }
-
-                // Step 2: Delete ReqDonasi if Donasi creation is successful
-                const deleteReqDonasiResponse = await fetch(`/api/reqDonasi/delete/${reqDonasiId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                    }
-                });
-
-                const deleteReqDonasiResult = await deleteReqDonasiResponse.json();
-
-                if (deleteReqDonasiResponse.ok && deleteReqDonasiResult.status === true) {
-                    showStatusMessage('Donasi berhasil dibuat dan permintaan donasi dihapus!', 'success');
-                    correctReqDonasiModal.style.display = 'none';
-                    correctReqDonasiForm.reset();
-                    fetchReqDonasiData(); // Refresh reqDonasi table
-                    fetchDonasiData(); // Refresh donasi table
-                } else {
-                    showStatusMessage(`Donasi berhasil dibuat, tetapi gagal menghapus permintaan donasi: ${deleteReqDonasiResult.message || 'Error tidak diketahui'}`, 'error');
-                    console.error('Delete ReqDonasi failed after Donasi creation:', deleteReqDonasiResult);
-                }
-
-            } catch (error) {
-                console.error('Error selama proses konfirmasi donasi:', error);
-                correctReqDonasiFormErrorMessages.textContent = `Error: ${error.message}`;
-                showStatusMessage(`Error selama proses konfirmasi donasi: ${error.message}`, 'error');
-            }
-        });
-
-
-        // Function to fetch and display Donasi data
-        async function fetchDonasiData() {
-            const donasiTableBody = document.getElementById('donasi-table-body');
-            donasiTableBody.innerHTML = `<tr><td colspan="6" class="loading-message">Memuat data donasi...</td></tr>`; // Updated colspan
-
-            try {
-                // Fetch data from the API route for Donasi
-                const response = await fetch('/api/donasi', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        // No Authorization header needed as per current API routes
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
-                }
-
-                const responseData = await response.json();
-
-                if (responseData.status === true && responseData.data) {
-                    renderDonasiTable(responseData.data);
-                } else {
-                    donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Gagal memuat data donasi: ${responseData.message || 'Error tidak diketahui'}</td></tr>`; // Updated colspan
-                    console.error('API response indicates failure for Donasi:', responseData);
-                }
-
-            } catch (error) {
-                donasiTableBody.innerHTML = `<tr><td colspan="6" class="error-message">Error memuat data donasi. Silakan cek konsol untuk detail.</td></tr>`; // Updated colspan
-                console.error('Error fetching Donasi data:', error);
-            }
-        }
-
-        // Function to render the Donasi table with provided data
-        function renderDonasiTable(donasiData) {
-            const donasiTableBody = document.getElementById('donasi-table-body');
-            donasiTableBody.innerHTML = ''; // Clear loading message
-
-            if (donasiData.length > 0) {
-                donasiData.forEach(item => {
+                data.forEach(item => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>
-                            <a href="#" class="edit-donasi-btn" data-id="${item.ID_DONASI}">Edit</a>
+                        <td>${item.idOrganisasi}</td>
+                        <td>${item.nama}</td>
+                        <td>${item.alamat}</td>
+                        <td>${item.request}</td>
+                        <td class="action-cell">
+                            <button class="btn btn-edit" data-id="${item.idOrganisasi}" data-type="request"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-delete" data-id="${item.idOrganisasi}" data-type="request"><i class="fas fa-trash"></i></button>
                         </td>
-                        <td>${item.ID_DONASI}</td>
-                        <td>${item.ID_ORGANISASI}</td>
-                        <td>${item.NAMA_BARANG_DONASI}</td>
-                        <td>${item.TGL_DONASI}</td>
-                        <td>${item.NAMA_PENERIMA}</td>
                     `;
-                    donasiTableBody.appendChild(row);
+                    tableBody.appendChild(row);
                 });
-                attachDonasiButtonListeners(); // Attach listeners after rendering
-            } else {
-                donasiTableBody.innerHTML = '<tr><td colspan="6" class="loading-message">Tidak ada data donasi ditemukan.</td></tr>'; // Updated colspan
             }
-        }
 
-        // Function to attach event listeners for Donasi action buttons
-        function attachDonasiButtonListeners() {
-            document.querySelectorAll('.edit-donasi-btn').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                    event.preventDefault();
-                    const donasiId = event.target.dataset.id;
-                    editDonasiFormErrorMessages.textContent = ''; // Clear previous errors
-
-                    try {
-                        // Fetch specific donasi data
-                        const response = await fetch(`/api/donasi/${donasiId}`);
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(`HTTP error! status: ${response.status}, Message: ${errorData.message || response.statusText}`);
-                        }
-                        const result = await response.json();
-                        if (result.status === true && result.data) {
-                            const donasiData = result.data;
-                            editDonasiIdInput.value = donasiData.ID_DONASI;
-                            editTglDonasiInput.value = donasiData.TGL_DONASI; // Assuming date format is compatible
-                            editNamaPenerimaInput.value = donasiData.NAMA_PENERIMA;
-                            editDonasiModal.style.display = 'flex';
-                        } else {
-                            // Using showStatusMessage for general page messages
-                            showStatusMessage(`Gagal memuat data donasi: ${result.message || 'Error tidak diketahui'}`, 'error');
-                        }
-                    } catch (error) {
-                        showStatusMessage(`Error memuat data donasi: ${error.message}`, 'error');
-                        console.error('Error fetching single Donasi data:', error);
-                    }
-                });
-            });
-
-            // Close button for edit donasi modal
-            editDonasiCloseButton.addEventListener('click', () => {
-                editDonasiModal.style.display = 'none';
-                editDonasiForm.reset();
-                editDonasiFormErrorMessages.textContent = '';
-            });
-        }
-
-        // Edit Donasi Form Submission Listener
-        editDonasiForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            editDonasiFormErrorMessages.textContent = '';
-
-            const donasiId = editDonasiIdInput.value;
-            const updatedData = {
-                TGL_DONASI: editTglDonasiInput.value,
-                NAMA_PENERIMA: editNamaPenerimaInput.value,
-            };
-
-            try {
-                const response = await fetch(`/api/donasi/update/${donasiId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify(updatedData)
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.status === true) {
-                    showStatusMessage('Data Donasi berhasil diperbarui!', 'success');
-                    editDonasiModal.style.display = 'none';
-                    editDonasiForm.reset();
-                    fetchDonasiData(); // Refresh the table
-                } else {
-                    console.error('Update Donasi gagal:', result.message);
-                    if (result.errors) {
-                        let errorMessages = 'Kesalahan validasi:\n';
-                        for (const field in result.errors) {
-                            errorMessages += `- ${field}: ${result.errors[field].join(', ')}\n`;
-                        }
-                        editDonasiFormErrorMessages.textContent = errorMessages;
-                    } else {
-                        editDonasiFormErrorMessages.textContent = result.message || 'Pembaruan gagal. Silakan coba lagi.';
-                    }
-                }
-            } catch (error) {
-                console.error('Error selama pembaruan Donasi:', error);
-                editDonasiFormErrorMessages.textContent = `Error memperbarui Donasi: ${error.message}`;
-                showStatusMessage(`Error memperbarui Donasi: ${error.message}`, 'error');
+            // --- MODAL & FORM LOGIC ---
+            function openModal(title, formHTML, submitHandler) {
+                modalTitle.textContent = title;
+                crudForm.innerHTML = formHTML;
+                modal.style.display = 'flex';
+                crudForm.onsubmit = (e) => {
+                    e.preventDefault();
+                    submitHandler(new FormData(crudForm));
+                    closeModal();
+                };
             }
-        });
 
-        // Update the window click listener to close modals
-        window.addEventListener('click', (event) => {
-            if (event.target.classList.contains('modal')) {
-                const modal = event.target;
-                if (modal.id === 'editDonasiModal') {
-                    editDonasiForm.reset();
-                    editDonasiFormErrorMessages.textContent = '';
-                } else if (modal.id === 'correctReqDonasiModal') {
-                    correctReqDonasiForm.reset();
-                    correctReqDonasiFormErrorMessages.textContent = '';
-                }
+            function closeModal() {
                 modal.style.display = 'none';
+                crudForm.innerHTML = '';
             }
-        });
 
-        // Initial data load: Fetch data and render when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchReqDonasiData();
-            fetchDonasiData();
-        });
+            function getDonasiFormHTML(item = {}) {
+                return `
+                    <input type="hidden" name="kodeProduk" value="${item.kodeProduk || ''}">
+                    <div class="form-group">
+                        <label>Nama Produk</label>
+                        <input type="text" name="namaProduk" value="${item.namaProduk || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Penitip</label>
+                        <input type="text" name="namaPenitip" value="${item.namaPenitip || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Organisasi</label>
+                        <input type="text" name="organisasi" value="${item.organisasi || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Penerima</label>
+                        <input type="text" name="namaPenerima" value="${item.namaPenerima || ''}" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                `;
+            }
 
-        // Contoh sederhana untuk menyorot link navigasi aktif (opsional)
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.navbar .nav-links a');
+            function getRequestFormHTML(item = {}) {
+                 return `
+                    <input type="hidden" name="idOrganisasi" value="${item.idOrganisasi || ''}">
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <input type="text" name="nama" value="${item.nama || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <input type="text" name="alamat" value="${item.alamat || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Request</label>
+                        <textarea name="request" rows="3" required>${item.request || ''}</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                `;
+            }
 
-            navLinks.forEach(link => {
-                // Anda perlu menyesuaikan logika ini agar sesuai dengan rute Laravel Anda
-                // Misalnya, jika rute 'Dashboard Owner' adalah '/admin/owner-dashboard'
-                // if (link.href.includes('/admin/owner-dashboard')) {
-                //     link.style.color = '#7BC9FF'; // Menyorot link aktif
-                // }
+
+            // --- CRUD HANDLERS ---
+
+            // ADD
+            document.getElementById('add-donasi-btn').addEventListener('click', () => {
+                const formHTML = getDonasiFormHTML();
+                openModal('Tambah Donasi Barang', formHTML, (formData) => {
+                    const newId = 'PRD' + (Math.floor(Math.random() * 900) + 100); // Generate simple random ID
+                    const newItem = {
+                        kodeProduk: newId,
+                        namaProduk: formData.get('namaProduk'),
+                        namaPenitip: formData.get('namaPenitip'),
+                        organisasi: formData.get('organisasi'),
+                        namaPenerima: formData.get('namaPenerima'),
+                        idPenitip: 'T' + (Math.floor(Math.random() * 90) + 10),
+                        tanggalDonasi: new Date().toLocaleDateString('id-ID'),
+                    };
+                    laporanDonasiData.push(newItem);
+                    renderDonasiTable(laporanDonasiData);
+                });
             });
+
+             document.getElementById('add-request-btn').addEventListener('click', () => {
+                const formHTML = getRequestFormHTML();
+                openModal('Tambah Request Donasi', formHTML, (formData) => {
+                    const newId = 'ORG' + (Math.floor(Math.random() * 900) + 100);
+                    const newItem = {
+                        idOrganisasi: newId,
+                        nama: formData.get('nama'),
+                        alamat: formData.get('alamat'),
+                        request: formData.get('request'),
+                    };
+                    laporanRequestData.push(newItem);
+                    renderRequestTable(laporanRequestData);
+                });
+            });
+
+            // EDIT & DELETE (using event delegation)
+            document.body.addEventListener('click', (e) => {
+                const target = e.target.closest('.btn-edit, .btn-delete');
+                if (!target) return;
+
+                const id = target.dataset.id;
+                const type = target.dataset.type;
+
+                if (target.classList.contains('btn-edit')) {
+                    if (type === 'donasi') {
+                        const item = laporanDonasiData.find(d => d.kodeProduk === id);
+                        const formHTML = getDonasiFormHTML(item);
+                        openModal('Edit Donasi Barang', formHTML, (formData) => {
+                           item.namaProduk = formData.get('namaProduk');
+                           item.namaPenitip = formData.get('namaPenitip');
+                           item.organisasi = formData.get('organisasi');
+                           item.namaPenerima = formData.get('namaPenerima');
+                           renderDonasiTable(laporanDonasiData);
+                        });
+                    } else if (type === 'request') {
+                         const item = laporanRequestData.find(d => d.idOrganisasi === id);
+                         const formHTML = getRequestFormHTML(item);
+                         openModal('Edit Request Donasi', formHTML, (formData) => {
+                           item.nama = formData.get('nama');
+                           item.alamat = formData.get('alamat');
+                           item.request = formData.get('request');
+                           renderRequestTable(laporanRequestData);
+                        });
+                    }
+                } else if (target.classList.contains('btn-delete')) {
+                    if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return;
+
+                    if (type === 'donasi') {
+                        laporanDonasiData = laporanDonasiData.filter(d => d.kodeProduk !== id);
+                        renderDonasiTable(laporanDonasiData);
+                    } else if (type === 'request') {
+                        laporanRequestData = laporanRequestData.filter(d => d.idOrganisasi !== id);
+                        renderRequestTable(laporanRequestData);
+                    }
+                }
+            });
+
+            // SEARCH
+            document.getElementById('search-donasi').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = laporanDonasiData.filter(item =>
+                    Object.values(item).some(val => val.toString().toLowerCase().includes(searchTerm))
+                );
+                renderDonasiTable(filteredData);
+            });
+
+            document.getElementById('search-request').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredData = laporanRequestData.filter(item =>
+                    Object.values(item).some(val => val.toString().toLowerCase().includes(searchTerm))
+                );
+                renderRequestTable(filteredData);
+            });
+
+
+            // --- PDF PRINTING ---
+            function getFormattedDate(date = new Date()) {
+                const day = date.getDate();
+                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                const month = monthNames[date.getMonth()];
+                const year = date.getFullYear();
+                return `${day} ${month} ${year}`;
+            }
+
+            function printLaporanDonasiPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'pt', 'a4');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.text("ReUse Mart", 40, 50);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.text("Jl. Green Eco Park No. 456 Yogyakarta", 40, 65);
+                doc.setLineWidth(0.5);
+                doc.line(40, 75, doc.internal.pageSize.getWidth() - 40, 75);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text("LAPORAN DONASI BARANG", doc.internal.pageSize.getWidth() / 2, 100, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Tanggal cetak: ${getFormattedDate()}`, 40, 115);
+                doc.autoTable({
+                    head: [['Kode Produk', 'Nama Produk', 'Id Penitip', 'Nama Penitip', 'Tanggal Donasi', 'Organisasi', 'Nama Penerima']],
+                    body: laporanDonasiData.map(item => Object.values(item)),
+                    startY: 130, theme: 'grid',
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0,0,0], fontStyle: 'bold', lineWidth: 0.5, lineColor: [0,0,0] },
+                    styles: { fontSize: 8, lineWidth: 0.5, lineColor: [0, 0, 0] },
+                });
+                doc.save('Laporan-Donasi-Barang.pdf');
+            }
+
+            function printLaporanRequestPDF() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('l', 'pt', 'a4'); // landscape
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(14);
+                doc.text("ReUse Mart", 40, 50);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.text("Jl. Green Eco Park No. 456 Yogyakarta", 40, 65);
+                doc.setLineWidth(0.5);
+                doc.line(40, 75, doc.internal.pageSize.getWidth() - 40, 75);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(11);
+                doc.text("LAPORAN REQUEST DONASI (BELUM TERPENUHI)", doc.internal.pageSize.getWidth() / 2, 100, { align: 'center' });
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Tanggal cetak: ${getFormattedDate()}`, 40, 115);
+                doc.autoTable({
+                    head: [['ID Organisasi', 'Nama', 'Alamat', 'Request']],
+                    body: laporanRequestData.map(item => Object.values(item)),
+                    startY: 130, theme: 'grid',
+                    headStyles: { fillColor: [255, 255, 255], textColor: [0,0,0], fontStyle: 'bold', lineWidth: 0.5, lineColor: [0,0,0] },
+                    styles: { fontSize: 9, lineWidth: 0.5, lineColor: [0, 0, 0] },
+                });
+                doc.save('Laporan-Request-Donasi.pdf');
+            }
+
+            // --- INITIALIZATION ---
+            renderDonasiTable(laporanDonasiData);
+            renderRequestTable(laporanRequestData);
+            closeModalBtn.addEventListener('click', closeModal);
+            document.getElementById('print-donasi-btn').addEventListener('click', printLaporanDonasiPDF);
+            document.getElementById('print-request-btn').addEventListener('click', printLaporanRequestPDF);
         });
     </script>
-
 </body>
 </html>
