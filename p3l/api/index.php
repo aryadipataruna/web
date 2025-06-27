@@ -1,1 +1,3 @@
-"api/index.php": { "runtime": "vercel-php@0.6.0" }
+<?php  
+
+require __DIR__ . "/../public/index.php";
